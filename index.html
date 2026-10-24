@@ -1,0 +1,1261 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeAnvil | Virtual Internship Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Montserrat:wght@500;600;700;800;900&family=Great+Vibes&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .font-cert { font-family: 'Montserrat', sans-serif; }
+        .cert-scale-wrapper { width: 100%; overflow: hidden; position: relative; }
+        body { overflow-x: hidden; }
+        .grid > * { min-width: 0; }
+        #cert-capture { position: fixed; left: -10000px; top: 0; }
+        #certificate-canvas {
+            width: 1122px; height: 793px; min-width: 1122px; min-height: 793px; background: #ffffff;
+            background-image: radial-gradient(rgba(245, 158, 11, 0.04) 1px, transparent 0); background-size: 18px 18px;
+            position: relative; overflow: hidden; transform-origin: top left; box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.28);
+            border: 1px solid #e2e8f0; user-select: none;
+        }
+        .offer-sheet {
+            width: 794px; height: 1123px; min-width: 794px; background: #fff; color: #0f172a; position: relative;
+            padding: 56px 64px; box-sizing: border-box; font-family: 'Inter', sans-serif; border: 1px solid #e2e8f0;
+        }
+        #offer-capture { position: fixed; left: -10000px; top: 0; }
+        @media print {
+            @page { size: A4 landscape; margin: 0; }
+            body * { visibility: hidden; }
+            #certificate-print-container, #certificate-print-container * { visibility: visible; }
+            #certificate-print-container { position: fixed; left: 0; top: 0; width: 100vw !important; height: 100vh !important; overflow: visible !important; display: flex !important; align-items: center; justify-content: center; background: #fff !important; z-index: 99999; padding: 0 !important; margin: 0 !important; }
+            #certificate-canvas { box-shadow: none !important; border: none !important; transform: none !important; margin: 0 !important; }
+        }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 4px; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
+
+    <!-- Top bar -->
+    <div class="bg-slate-950 border-b border-slate-800 text-slate-200 text-xs py-2.5 px-4 font-medium">
+        <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
+            <div class="flex flex-wrap items-center gap-3">
+                <span class="inline-flex items-center gap-1.5 bg-amber-500/15 border border-amber-500/30 text-amber-400 px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider">Virtual Internship Portal</span>
+                <span id="top-udyam-line" class="hidden text-[11px] sm:text-xs text-slate-300"></span>
+            </div>
+            <div class="flex items-center gap-3 ml-auto">
+                <span class="text-emerald-400 font-semibold text-[11px] flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> 2026 Batch Open</span>
+                <button onclick="openAuthModal('signup')" class="bg-amber-500 hover:bg-amber-400 text-slate-950 px-3 py-0.5 rounded font-bold text-[11px] transition">Apply Now &rarr;</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navbar -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <a href="#" onclick="navigateTo('home'); return false;" class="flex items-center gap-3.5">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-0.5 shadow-lg border border-amber-500/40 flex items-center justify-center">
+                    <svg class="w-9 h-9" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <defs><linearGradient id="anvilGrad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#fbbf24"/><stop offset="50%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#ea580c"/></linearGradient></defs>
+                        <path d="M22 14L13 21L22 28" stroke="#fbbf24" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M42 14L51 21L42 28" stroke="#fbbf24" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M35 12L29 30" stroke="#ef4444" stroke-width="3.2" stroke-linecap="round"/>
+                        <path d="M10 36H54L49 44C44 45 41 48 41 52H23C23 48 19 45 15 44L10 36Z" fill="url(#anvilGrad)"/>
+                        <rect x="17" y="53" width="30" height="4.5" rx="2" fill="#f8fafc"/>
+                    </svg>
+                </div>
+                <div class="flex flex-col">
+                    <div class="flex items-center gap-1 text-xl sm:text-2xl font-black tracking-tight leading-none"><span class="text-slate-900">CODE</span><span class="text-amber-500">ANVIL</span></div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500 mt-1">Virtual Internship Portal</span>
+                </div>
+            </a>
+            <nav class="hidden md:flex items-center gap-7 text-sm font-semibold text-slate-700">
+                <a href="#" onclick="goSection('home-top'); return false;" class="hover:text-amber-600 transition">Home</a>
+                <a href="#" onclick="goSection('domains-section'); return false;" class="hover:text-amber-600 transition">Internship Programs</a>
+                <a href="#" onclick="goSection('how-it-works'); return false;" class="hover:text-amber-600 transition">Certification Process</a>
+                <a href="#" onclick="goSection('verify-section'); return false;" class="hover:text-amber-600 transition flex items-center gap-1.5"><i class="fa-solid fa-shield-halved text-emerald-600"></i> Verify Certificate</a>
+                <a href="#" onclick="goSection('faq-section'); return false;" class="hover:text-amber-600 transition">FAQs</a>
+            </nav>
+            <div class="flex items-center gap-3" id="nav-auth-area"></div>
+        </div>
+    </header>
+
+    <div id="toast-container" class="fixed bottom-5 right-5 z-[60] flex flex-col gap-2 max-w-sm w-full pointer-events-none px-4 sm:px-0"></div>
+
+    <!-- ================= HOME ================= -->
+    <main id="view-home" class="flex-grow">
+        <section id="home-top" class="relative overflow-hidden bg-slate-950 text-white py-16 lg:py-24 border-b border-slate-800">
+            <div class="absolute inset-0 opacity-15 bg-[radial-gradient(#f59e0b_1px,transparent_1px)] [background-size:24px_24px]"></div>
+            <div class="absolute -top-24 -right-24 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl"></div>
+            <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+                <div class="grid lg:grid-cols-12 gap-12 items-center">
+                    <div class="lg:col-span-7 space-y-6">
+                        <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold">
+                            <i class="fa-solid fa-laptop-code"></i><span>4-Week Remote Virtual Internship Program</span>
+                        </div>
+                        <h1 class="text-3xl sm:text-5xl lg:text-[54px] font-black tracking-tight leading-[1.12]">
+                            Build Real-World Tech Projects &amp; Earn <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-orange-400 to-red-500">QR-Verifiable</span> Certificates
+                        </h1>
+                        <p class="text-slate-300 text-base sm:text-lg max-w-2xl leading-relaxed">
+                            Join the 4-week virtual internship program by <strong>CodeAnvil</strong>. Receive your Offer Letter instantly on registration, complete 3 industry-style projects, and earn a QR-verifiable certificate.
+                        </p>
+                        <div class="flex flex-wrap gap-4 pt-2">
+                            <button onclick="document.getElementById('domains-section').scrollIntoView({behavior:'smooth'})" class="px-7 py-4 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-slate-950 font-black text-base shadow-lg shadow-amber-500/25 flex items-center gap-2.5 transition">Browse Internship Domains <i class="fa-solid fa-arrow-right"></i></button>
+                            <button onclick="document.getElementById('verify-section').scrollIntoView({behavior:'smooth'})" class="px-6 py-4 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700 text-white font-bold text-base flex items-center gap-2 transition"><i class="fa-solid fa-qrcode text-amber-400"></i> Verify Certificate ID</button>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-6 border-t border-slate-800/80">
+                            <div><div class="text-2xl sm:text-3xl font-black text-amber-400">4 Weeks</div><div class="text-xs text-slate-400 font-medium">Remote Program</div></div>
+                            <div><div class="text-2xl sm:text-3xl font-black text-white">₹0 Free</div><div class="text-xs text-slate-400 font-medium">Registration &amp; Offer Letter</div></div>
+                            <div><div class="text-2xl sm:text-3xl font-black text-emerald-400">₹99 Only</div><div class="text-xs text-slate-400 font-medium">Verified Certificate Fee</div></div>
+                            <div><div class="text-2xl sm:text-3xl font-black text-sky-400">3 Projects</div><div class="text-xs text-slate-400 font-medium">To Complete</div></div>
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-5">
+                        <div class="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 sm:p-6 shadow-2xl relative">
+                            <div class="absolute -top-3.5 right-6 bg-gradient-to-r from-emerald-500 to-teal-500 text-slate-950 text-[11px] font-black px-3.5 py-1 rounded-full uppercase tracking-wider shadow-lg"><i class="fa-solid fa-check-double mr-1"></i> Certificate Preview</div>
+                            <div class="bg-white text-slate-900 rounded-xl p-5 relative overflow-hidden border-2 border-amber-400 shadow-lg">
+                                <div class="w-24 h-24 bg-amber-500 rotate-45 absolute -top-12 -left-12 shadow"></div>
+                                <div class="w-16 h-16 bg-neutral-900 rotate-45 absolute -top-8 -left-8"></div>
+                                <div class="w-36 h-10 bg-amber-400 -rotate-12 absolute -bottom-5 -right-5"></div>
+                                <div class="flex justify-center items-center mb-3 relative z-10">
+                                    <div class="flex items-center gap-1.5">
+                                        <div class="w-8 h-8 rounded-full bg-amber-400 border border-amber-600 flex flex-col items-center justify-center leading-none shadow-sm">
+                                            <span class="text-[7px] font-black text-slate-900">&lt;/&gt;</span><span class="text-[6px] font-black text-slate-900">CODE</span><span class="text-[5px] font-bold text-white italic">Anvil</span>
+                                        </div>
+                                        <span class="font-black text-xs tracking-tight"><span class="text-amber-500">CODE</span> <span class="text-red-600">ANVIL</span></span>
+                                    </div>
+                                </div>
+                                <div class="text-center space-y-1 my-3 relative z-10">
+                                    <p class="text-[8px] font-bold text-slate-700 tracking-widest">INTERN ID:- CA1000</p>
+                                    <h4 class="text-[11px] sm:text-xs font-black tracking-[0.2em] uppercase text-black leading-tight">INTERNSHIP COMPLETION<br>CERTIFICATE</h4>
+                                    <p class="text-[7.5px] font-semibold tracking-[0.18em] text-slate-700 pt-0.5">THIS CERTIFICATE IS AWARDED TO</p>
+                                    <p class="text-sm sm:text-base font-extrabold text-black border-b-2 border-black inline-block px-6 pb-0.5">Student Name</p>
+                                    <p class="text-[7px] font-semibold text-slate-800 leading-relaxed pt-1 uppercase tracking-wider">FOR SUCCESSFULLY COMPLETING THE <strong class="text-black">WEB DEVELOPMENT</strong> INTERNSHIP<br>WITH DEDICATION AND HARD WORK.</p>
+                                </div>
+                                <div class="flex justify-between items-end pt-2 border-t border-slate-100 text-[7.5px] relative z-10 pr-4">
+                                    <div class="text-center"><i class="fa-solid fa-qrcode text-xl text-black"></i><div class="font-bold text-[6.5px] mt-0.5">INTERN ID:- CA1000</div></div>
+                                    <div class="text-center"><div class="font-['Great_Vibes'] text-sm text-slate-700 -mb-1">Authorized</div><div class="font-bold border-t border-black px-2 text-black">Founder &amp; Director</div><div class="italic text-[6.5px]">President</div></div>
+                                    <div class="text-center"><div class="font-semibold text-slate-800">www.codeanvil.in</div><div class="text-[6px] font-bold">CONTACT@CODEANVIL.IN</div></div>
+                                </div>
+                            </div>
+                            <div class="mt-5 grid grid-cols-2 gap-3 text-xs">
+                                <div class="bg-slate-950/90 p-3.5 rounded-xl border border-slate-800 flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400"><i class="fa-solid fa-file-contract text-base"></i></div>
+                                    <div><div class="font-bold text-white">Instant Offer Letter</div><div class="text-slate-400 text-[11px]">Issued Free on Signup</div></div>
+                                </div>
+                                <div class="bg-slate-950/90 p-3.5 rounded-xl border border-slate-800 flex items-center gap-3">
+                                    <div class="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400"><i class="fa-solid fa-qrcode text-base"></i></div>
+                                    <div><div class="font-bold text-white">QR Verified Credential</div><div class="text-slate-400 text-[11px]">One-time ₹99 fee</div></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why CodeAnvil -->
+        <section class="bg-white border-b border-slate-200 py-10">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <p class="text-center text-xs font-extrabold uppercase tracking-[0.2em] text-slate-400 mb-8">Why CodeAnvil Virtual Internship</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-sm hover:border-amber-400 transition"><div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-600 flex items-center justify-center text-xl"><i class="fa-solid fa-house-laptop"></i></div><div><div class="font-black text-base text-slate-900 leading-none">100% Remote</div><div class="text-[11px] text-slate-500 font-medium mt-1">Learn from anywhere, at your pace</div></div></div>
+                    <div class="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-sm hover:border-amber-400 transition"><div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl"><i class="fa-solid fa-file-contract"></i></div><div><div class="font-black text-base text-slate-900 leading-none">Free Offer Letter</div><div class="text-[11px] text-slate-500 font-medium mt-1">Issued instantly on registration</div></div></div>
+                    <div class="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-sm hover:border-amber-400 transition"><div class="w-12 h-12 rounded-xl bg-sky-100 text-sky-600 flex items-center justify-center text-xl"><i class="fa-solid fa-code-branch"></i></div><div><div class="font-black text-base text-slate-900 leading-none">3 Real Projects</div><div class="text-[11px] text-slate-500 font-medium mt-1">Build a portfolio you can show</div></div></div>
+                    <div class="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200/80 shadow-sm hover:border-amber-400 transition"><div class="w-12 h-12 rounded-xl bg-rose-100 text-rose-600 flex items-center justify-center text-xl"><i class="fa-solid fa-qrcode"></i></div><div><div class="font-black text-base text-slate-900 leading-none">QR Verification</div><div class="text-[11px] text-slate-500 font-medium mt-1">Anyone can verify with Intern ID</div></div></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="domains-section" class="py-16 lg:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <span class="text-xs font-extrabold uppercase tracking-widest text-amber-600 bg-amber-100 px-3 py-1 rounded-full">Choose Your Career Track</span>
+                <h2 class="text-3xl sm:text-4xl font-black text-slate-900 mt-3">Active Virtual Internship Domains</h2>
+                <p class="text-slate-600 mt-2 text-sm sm:text-base">Select your preferred domain, build 3 real-world portfolio projects at your own pace, and earn an internship certificate.</p>
+            </div>
+            <div id="domains-grid" class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+        </section>
+
+        <section id="how-it-works" class="py-16 bg-slate-900 text-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center max-w-2xl mx-auto mb-14">
+                    <span class="text-xs font-extrabold uppercase tracking-widest text-amber-400">Simple 4-Step Journey</span>
+                    <h2 class="text-3xl sm:text-4xl font-black mt-2">How CodeAnvil Internship Works</h2>
+                    <p class="text-slate-400 text-sm mt-2">Designed for college students &amp; freshers to gain practical skills through real projects.</p>
+                </div>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-6"><span class="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 font-black flex items-center justify-center text-lg mb-4">1</span><h3 class="font-bold text-lg mb-2">Register &amp; Pick Domain</h3><p class="text-slate-400 text-sm">Create your student account and choose your internship domain (Web Development, Python, AI/ML and more).</p></div>
+                    <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-6"><span class="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 font-black flex items-center justify-center text-lg mb-4">2</span><h3 class="font-bold text-lg mb-2">Instant Offer Letter</h3><p class="text-slate-400 text-sm">Receive your Intern ID (for example, CA1096) and download your Offer Letter from your dashboard.</p></div>
+                    <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-6"><span class="w-10 h-10 rounded-xl bg-amber-500 text-slate-950 font-black flex items-center justify-center text-lg mb-4">3</span><h3 class="font-bold text-lg mb-2">Complete &amp; Submit Tasks</h3><p class="text-slate-400 text-sm">Build the three assigned projects and submit your GitHub repository or live project links on your dashboard.</p></div>
+                    <div class="bg-slate-800/80 border border-slate-700 rounded-2xl p-6"><span class="w-10 h-10 rounded-xl bg-emerald-500 text-slate-950 font-black flex items-center justify-center text-lg mb-4">4</span><h3 class="font-bold text-lg mb-2">Pay ₹99 &amp; Get Certificate</h3><p class="text-slate-400 text-sm">Pay the one-time ₹99 certificate fee via UPI. Once your tasks and payment are approved, download your verified certificate.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="verify-section" class="py-16 bg-amber-50/60 border-b border-slate-200">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-white rounded-3xl shadow-xl border border-slate-200 p-6 sm:p-10">
+                    <div class="text-center max-w-xl mx-auto">
+                        <div class="w-14 h-14 rounded-2xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl mx-auto mb-4"><i class="fa-solid fa-shield-halved"></i></div>
+                        <h2 class="text-2xl sm:text-3xl font-black text-slate-900">Verify Internship Certificate</h2>
+                        <p class="text-slate-600 text-sm mt-2">Employers, College HODs, and Students can verify the authenticity of any CodeAnvil certificate by entering the Intern ID below.</p>
+                    </div>
+                    <form onsubmit="handleVerifySearch(event)" class="mt-6 flex flex-col sm:flex-row gap-3 max-w-xl mx-auto">
+                        <input type="text" id="verify-input" placeholder="Enter Intern ID (e.g., CA1096)" required class="flex-grow px-4 py-3.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none font-semibold uppercase text-slate-800">
+                        <button type="submit" class="px-7 py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold transition flex items-center justify-center gap-2"><i class="fa-solid fa-magnifying-glass"></i> Verify Now</button>
+                    </form>
+                    
+                    <div id="verify-result-box" class="mt-6 hidden"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="faq-section" class="py-16 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-10">
+                <h2 class="text-2xl sm:text-3xl font-black text-slate-900">Frequently Asked Questions</h2>
+                <p class="text-slate-500 text-sm mt-1">Everything you need to know about CodeAnvil Internships &amp; Certificates</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"><h4 class="font-bold text-slate-900 mb-2">Is there any registration fee?</h4><p class="text-sm text-slate-600">Registration and your Internship Offer Letter are 100% FREE. Only after you complete your tasks do you pay a minimal ₹99 fee for project evaluation, QR verification hosting, and verified certificate issuance.</p></div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"><h4 class="font-bold text-slate-900 mb-2">How do I pay the ₹99 certificate fee?</h4><p class="text-sm text-slate-600">After you submit your tasks, scan the UPI QR code (<span class="font-mono">9839411035@ptsbi</span>) with any UPI app such as PhonePe, Google Pay or Paytm, then enter the 12-digit UTR number. You can also upload a screenshot or send it on WhatsApp. Your certificate unlocks once CodeAnvil approves your tasks and payment.</p></div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"><h4 class="font-bold text-slate-900 mb-2">What does the certificate include?</h4><p class="text-sm text-slate-600">Our certificates include your exact internship duration, domain, Intern ID, and a scannable verification QR code that anyone can use to check it.</p></div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"><h4 class="font-bold text-slate-900 mb-2">How long does approval take?</h4><p class="text-sm text-slate-600">We review tasks and payments manually, so please allow a few working days. For urgent questions, use the WhatsApp button at the bottom of the page.</p></div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"><h4 class="font-bold text-slate-900 mb-2">What if my tasks are rejected?</h4><p class="text-sm text-slate-600">You will see a note from the reviewer on your dashboard. Fix the issues and submit again. There is no extra fee for re-evaluation.</p></div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"><h4 class="font-bold text-slate-900 mb-2">I forgot my password. What should I do?</h4><p class="text-sm text-slate-600">Open Intern Login, enter your email and tap "Forgot password?". We will email you a link to set a new password.</p></div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"><h4 class="font-bold text-slate-900 mb-2">Is the internship paid?</h4><p class="text-sm text-slate-600">No. This is an unpaid, remote learning internship focused on building real projects for your portfolio.</p></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ================= DASHBOARD ================= -->
+    <section id="view-dashboard" class="hidden flex-grow py-8 sm:py-12 bg-slate-100">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div class="bg-slate-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                <div class="space-y-2">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-xs font-bold"><span>INTERN ID: <strong id="dash-intern-id">CA1096</strong></span></div>
+                    <h1 class="text-2xl sm:text-3xl font-black">Welcome, <span id="dash-student-name" class="text-amber-400">Student</span>!</h1>
+                    <p class="text-slate-300 text-sm">Domain: <strong id="dash-domain" class="text-white"></strong> &bull; Duration: <strong id="dash-duration" class="text-white"></strong></p>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <div class="px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs"><div class="text-slate-400">Step 1: Tasks</div><div id="dash-task-badge" class="font-bold text-amber-400 mt-0.5">Pending Submission</div></div>
+                    <div class="px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs"><div class="text-slate-400">Step 2: ₹99 Fee</div><div id="dash-payment-badge" class="font-bold text-rose-400 mt-0.5">Unpaid</div></div>
+                    <div class="px-4 py-2.5 rounded-xl bg-slate-800 border border-slate-700 text-xs"><div class="text-slate-400">Step 3: Certificate</div><div id="dash-cert-badge" class="font-bold text-slate-400 mt-0.5">Locked</div></div>
+                </div>
+            </div>
+
+            <div class="grid lg:grid-cols-12 gap-8">
+                <div class="lg:col-span-5 space-y-6">
+
+                    <!-- Offer letter (fixed) -->
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                        <div class="flex items-center justify-between mb-2">
+                            <h3 class="font-extrabold text-slate-900 flex items-center gap-2"><i class="fa-solid fa-file-contract text-amber-500"></i> Internship Offer Letter</h3>
+                            <span class="text-[11px] bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full font-bold">FREE</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-4">Your offer letter was issued on registration. View it or download the PDF anytime.</p>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="openOfferPreview()" class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center gap-2"><i class="fa-regular fa-eye"></i> View Offer Letter</button>
+                            <button onclick="downloadOfferLetter()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-xs flex items-center gap-2 shadow"><i class="fa-solid fa-download"></i> Download PDF</button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-extrabold text-slate-900 flex items-center gap-2"><i class="fa-solid fa-user-pen text-amber-500"></i> Certificate Details</h3>
+                            <span class="text-[11px] bg-slate-100 px-2.5 py-1 rounded-full font-semibold text-slate-600">Appears on Certificate</span>
+                        </div>
+                        <form onsubmit="saveProfileDetails(event)" class="space-y-3 text-sm">
+                            <div><label class="block text-xs font-bold text-slate-600 mb-1">Full Name (Exact Spelling for Certificate)</label><input type="text" id="edit-name" required class="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-semibold"></div>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div><label class="block text-xs font-bold text-slate-600 mb-1">Internship Domain</label><select id="edit-domain" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-semibold bg-white"></select></div>
+                                <div><label class="block text-xs font-bold text-slate-600 mb-1">College / University</label><input type="text" id="edit-college" class="w-full px-3.5 py-2 rounded-xl border border-slate-300 font-semibold"></div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div><label class="block text-xs font-bold text-slate-600 mb-1">Start Date (auto)</label><input type="text" id="edit-start-date" readonly class="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-100 text-slate-500 font-semibold uppercase"></div>
+                                <div><label class="block text-xs font-bold text-slate-600 mb-1">End Date (auto)</label><input type="text" id="edit-end-date" readonly class="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-100 text-slate-500 font-semibold uppercase"></div>
+                            </div>
+                            <button type="submit" class="w-full py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs uppercase tracking-wider transition">Update Details</button>
+                        </form>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-extrabold text-slate-900 flex items-center gap-2"><i class="fa-solid fa-list-check text-amber-500"></i> Step 1: Submit Assigned Tasks</h3>
+                            <span id="task-status-pill" class="text-xs font-bold px-2.5 py-1 rounded-full bg-amber-100 text-amber-800">0/3 Done</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mb-4">Complete the following 3 tasks in your chosen domain and paste your GitHub repository or live project links below.</p>
+                        <div id="task-review-note" class="hidden mb-3 p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-800"></div>
+                        <form onsubmit="handleTaskSubmit(event)" class="space-y-4 text-sm">
+                            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200"><label id="task1-label" class="block font-bold text-xs text-slate-800 mb-0.5">Task 1 (GitHub / Live Link) *</label><p id="task1-desc" class="text-[11px] text-slate-500 mb-1.5 leading-relaxed"></p><input type="url" id="task1-link" required placeholder="https://github.com/username/project-1" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs"></div>
+                            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200"><label id="task2-label" class="block font-bold text-xs text-slate-800 mb-0.5">Task 2 (GitHub / Live Link) *</label><p id="task2-desc" class="text-[11px] text-slate-500 mb-1.5 leading-relaxed"></p><input type="url" id="task2-link" required placeholder="https://github.com/username/project-2" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs"></div>
+                            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200"><label id="task3-label" class="block font-bold text-xs text-slate-800 mb-0.5">Task 3 (GitHub / Live Link) *</label><p id="task3-desc" class="text-[11px] text-slate-500 mb-1.5 leading-relaxed"></p><input type="url" id="task3-link" required placeholder="https://github.com/username/final-project" class="w-full px-3 py-2 rounded-lg border border-slate-300 text-xs"></div>
+                            <button id="task-submit-btn" type="submit" class="disabled:opacity-50 w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-sm transition flex items-center justify-center gap-2 shadow"><i class="fa-solid fa-cloud-arrow-up"></i> Save &amp; Submit All Tasks</button>
+                        </form>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border-2 border-amber-400 p-6 shadow-md">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="font-extrabold text-slate-900 flex items-center gap-2"><i class="fa-solid fa-indian-rupee-sign text-emerald-600"></i> Step 2: Certificate Fee (₹99)</h3>
+                            <span class="bg-emerald-100 text-emerald-800 text-xs font-black px-2.5 py-1 rounded-full">₹99 ONLY</span>
+                        </div>
+                        <div id="payment-locked-overlay" class="p-4 rounded-xl bg-slate-100 border border-slate-200 text-center space-y-2">
+                            <i class="fa-solid fa-lock text-2xl text-slate-400"></i>
+                            <p class="text-xs font-bold text-slate-700">Complete &amp; Submit Step 1 (Tasks) First</p>
+                            <p class="text-[11px] text-slate-500">Once you submit your 3 project links above, the ₹99 UPI QR payment box will unlock automatically.</p>
+                        </div>
+                        <div id="payment-active-box" class="hidden space-y-4">
+                            <p class="text-xs text-slate-600">Scan the official CodeAnvil UPI QR below using any UPI App (GPay, PhonePe, Paytm) to pay <strong>₹99.00</strong> and enter your 12-digit UTR number.</p>
+                            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col items-center text-center">
+                                <div class="text-xs font-bold text-slate-800 mb-2">Merchant: CODEANVIL INTERNSHIPS</div>
+                                <div class="bg-white p-3 rounded-xl border border-slate-200 shadow-sm"><img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=upi%3A%2F%2Fpay%3Fpa%3D9839411035%40ptsbi%26pn%3DCodeAnvil%26am%3D99.00%26cu%3DINR" alt="UPI QR 9839411035@ptsbi" class="w-40 h-40 mx-auto" onerror="this.src='https://placehold.co/200x200/fff/000?text=9839411035@ptsbi'"></div>
+                                <div class="mt-3 flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-slate-300 text-xs"><span class="font-mono font-bold text-slate-900">9839411035@ptsbi</span><button type="button" onclick="copyUpiId()" class="text-amber-600 hover:text-amber-700 font-bold ml-1"><i class="fa-regular fa-copy"></i> Copy</button></div>
+                                <a href="upi://pay?pa=9839411035@ptsbi&pn=CodeAnvil&am=99.00&cu=INR" class="mt-3 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow"><i class="fa-solid fa-mobile-screen-button"></i> Pay ₹99 via UPI App</a>
+                            </div>
+                            <div id="payment-note" class="hidden p-3 rounded-xl bg-rose-50 border border-rose-200 text-xs font-semibold text-rose-800"></div>
+                            <form onsubmit="handleUtrSubmit(event)" class="space-y-3">
+                                <div><label class="block text-xs font-bold text-slate-700 mb-1">Enter 12-Digit UPI Reference / UTR No. *</label><input type="text" id="utr-input" required pattern="[0-9]{12}" inputmode="numeric" maxlength="12" placeholder="e.g. 421589632147" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-mono text-sm font-bold tracking-wider"></div>
+                                <div><label class="block text-xs font-bold text-slate-700 mb-1">Payment Screenshot (optional, recommended)</label><input type="file" id="proof-input" accept="image/*" class="w-full text-xs file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-slate-900 file:text-white file:font-bold"><div id="proof-status" class="text-[11px] text-emerald-700 font-bold mt-1"></div></div>
+                                <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-extrabold text-sm shadow-md transition">Submit Payment Details</button>
+                                <button type="button" onclick="sendProofWhatsApp()" class="w-full py-2.5 rounded-xl bg-green-500 hover:bg-green-600 text-white font-bold text-xs flex items-center justify-center gap-2"><i class="fa-brands fa-whatsapp text-base"></i> Send payment screenshot on WhatsApp</button>
+                            </form>
+                        </div>
+                        <div id="payment-verified-box" class="hidden p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-center space-y-1">
+                            <i class="fa-solid fa-circle-check text-2xl text-emerald-600"></i>
+                            <div class="font-black text-sm text-emerald-950">₹99 Payment Confirmed</div>
+                            <div class="text-xs text-emerald-700">UTR: <span id="verified-utr-display" class="font-mono font-bold"></span></div>
+                            <div class="text-[11px] text-emerald-600">Your certificate is unlocked on the right.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-7 space-y-4">
+                    <div class="bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm">
+                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-200">
+                            <div>
+                                <h3 class="font-black text-lg text-slate-900 flex items-center gap-2"><i class="fa-solid fa-award text-amber-500"></i> Official Internship Certificate</h3>
+                                <p class="text-xs text-slate-500" id="cert-access-subtitle">Complete your tasks and ₹99 UPI payment to unlock Print &amp; Download.</p>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-3">
+                                <button id="btn-print-cert" onclick="triggerPrintCertificate()" disabled class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow transition"><i class="fa-solid fa-print"></i> Print Certificate</button>
+                                <button id="btn-download-cert" onclick="triggerDownloadCertificate()" disabled class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 disabled:from-slate-300 disabled:to-slate-300 disabled:cursor-not-allowed text-white font-bold text-xs sm:text-sm flex items-center gap-2 shadow transition"><i class="fa-solid fa-download"></i> Download PDF</button>
+                            </div>
+                        </div>
+
+                        <div class="relative mt-4">
+                            <div id="cert-lock-overlay" class="absolute inset-0 z-30 bg-slate-900/60 backdrop-blur-[3px] rounded-xl flex flex-col items-center justify-center p-6 text-center text-white">
+                                <div class="w-16 h-16 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center text-2xl mb-3 shadow-lg"><i class="fa-solid fa-lock"></i></div>
+                                <h4 class="text-xl font-black">Certificate Locked</h4>
+                                <p id="cert-lock-reason" class="text-xs sm:text-sm text-slate-200 max-w-md mt-1">Submit your 3 tasks and pay ₹99 via UPI (<span class="font-mono text-amber-300">9839411035@ptsbi</span>). Your certificate unlocks after CodeAnvil approves both.</p>
+                            </div>
+
+                            <div class="cert-scale-wrapper" id="certificate-print-container">
+                                <div id="certificate-canvas" class="font-cert text-black select-none">
+                                    <svg class="absolute top-0 left-0 w-[680px] h-[440px] pointer-events-none z-0" viewBox="0 0 680 440" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <defs><filter id="tlShadow" x="-10%" y="-10%" width="130%" height="130%"><feDropShadow dx="4" dy="6" stdDeviation="6" flood-color="#000000" flood-opacity="0.22"/></filter></defs>
+                                        <polygon points="0,0 640,0 0,130" fill="#cbd5e1" opacity="0.55"/>
+                                        <polygon points="0,0 130,0 0,420" fill="#94a3b8" opacity="0.45"/>
+                                        <polygon points="0,0 590,0 190,72 0,72" fill="#f59e0b" filter="url(#tlShadow)"/>
+                                        <polygon points="0,120 74,175 0,385" fill="#fbbf24" filter="url(#tlShadow)"/>
+                                        <polygon points="0,0 198,0 265,68 74,185 0,132" fill="#1c1917" filter="url(#tlShadow)"/>
+                                    </svg>
+                                    <svg class="absolute bottom-0 right-0 w-[850px] h-[190px] pointer-events-none z-0" viewBox="0 0 850 190" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <polygon points="40,190 850,55 850,190" fill="#fcd34d"/>
+                                        <polygon points="290,190 850,82 850,190" fill="#f59e0b"/>
+                                    </svg>
+
+                                    <div class="relative z-10 w-full h-full flex flex-col justify-between px-16 pt-10 pb-12">
+                                        <!-- Logo: CodeAnvil only -->
+                                        <div class="flex items-center justify-center pl-24">
+                                            <img id="cert-custom-codeanvil-img" class="hidden h-[88px] w-auto object-contain" alt="CodeAnvil">
+                                            <div id="cert-default-codeanvil-logo" class="flex items-center gap-3.5">
+                                                <svg class="w-[88px] h-[88px] drop-shadow-md" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+                                                    <defs><linearGradient id="caBadgeGrad" x1="0" y1="0" x2="120" y2="120" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#fbbf24"/><stop offset="60%" stop-color="#f59e0b"/><stop offset="100%" stop-color="#d97706"/></linearGradient></defs>
+                                                    <circle cx="60" cy="60" r="56" fill="url(#caBadgeGrad)" stroke="#f59e0b" stroke-width="2"/>
+                                                    <circle cx="60" cy="60" r="49" fill="none" stroke="#ffffff" stroke-width="3.5"/>
+                                                    <text x="60" y="42" font-family="Montserrat, sans-serif" font-size="22" font-weight="800" fill="#292524" text-anchor="middle">&lt;/&gt;</text>
+                                                    <text x="60" y="68" font-family="Montserrat, sans-serif" font-size="22" font-weight="900" fill="#292524" text-anchor="middle" letter-spacing="1">CODE</text>
+                                                    <text x="60" y="91" font-family="Georgia, serif" font-style="italic" font-size="20" font-weight="700" fill="#ffffff" text-anchor="middle">Anvil</text>
+                                                </svg>
+                                                <div class="flex items-center gap-2 text-[34px] font-black tracking-wide leading-none"><span class="text-[#f59e0b]">CODE</span><span class="text-[#ef4444]">ANVIL</span></div>
+                                            </div>
+                                        </div>
+
+                                        <div class="text-center flex flex-col items-center my-auto pt-1">
+                                            <div class="text-[15px] font-semibold tracking-[0.08em] text-slate-900 mb-2.5">INTERN ID:- <span id="cert-top-id">CA1000</span></div>
+                                            <h1 class="text-[31px] font-extrabold tracking-[0.26em] text-black uppercase leading-snug">INTERNSHIP COMPLETION</h1>
+                                            <h2 class="text-[31px] font-extrabold tracking-[0.26em] text-black uppercase leading-snug mt-0.5">CERTIFICATE</h2>
+                                            <p class="text-[15px] font-semibold tracking-[0.22em] text-slate-800 uppercase mt-4 mb-4">THIS CERTIFICATE IS AWARDED TO</p>
+                                            <div class="w-[740px] border-b-[2.5px] border-black pb-2 mb-5"><div id="cert-student-name" class="text-[38px] font-extrabold text-black tracking-wide leading-tight">Student Name</div></div>
+                                            <div class="text-[14.5px] font-semibold tracking-[0.13em] text-slate-900 uppercase leading-[1.95] max-w-[860px]">
+                                                <div>FOR SUCCESSFULLY COMPLETING THE &nbsp;<strong id="cert-domain-name" class="font-black text-black">WEB DEVELOPMENT</strong>&nbsp; INTERNSHIP</div>
+                                                <div>DURING <span id="cert-start-date">JULY 12, 2026</span> TO <span id="cert-end-date">AUGUST 12, 2026</span>, WE APPRECIATE THE INTERN'S</div>
+                                                <div>DEDICATION, HARD WORK, AND POSITIVE IMPACT ON OUR TEAM.</div>
+                                                <div>WE WISH THEM CONTINUED SUCCESS IN ALL FUTURE ENDEAVORS.</div>
+                                            </div>
+                                        </div>
+
+                                        <div class="pt-3 pb-2">
+                                            <div class="flex items-end justify-between pr-24">
+                                                <div class="flex flex-col items-center">
+                                                    <div id="cert-qr-box" class="w-[108px] h-[108px] bg-white p-1 border border-slate-300 flex items-center justify-center"></div>
+                                                    <div class="text-[13.5px] font-semibold tracking-wider text-slate-900 mt-1.5">INTERN ID:- <span id="cert-bottom-id">CA1000</span></div>
+                                                </div>
+                                                <div class="flex flex-col items-center text-center mb-2">
+                                                    <svg class="w-52 h-16 -mb-2" viewBox="0 0 260 85" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M35 62 C20 40, 52 10, 74 22 C86 29, 54 66, 42 60 C32 55, 68 32, 92 26 C105 23, 94 56, 106 56 C116 56, 124 36, 134 38 C142 40, 132 55, 144 55 C154 55, 166 28, 178 24 C186 21, 170 68, 156 74 C144 79, 160 48, 184 44 C204 41, 222 36, 238 31" stroke="#334155" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+                                                        <path d="M52 68 C108 62, 168 58, 228 53" stroke="#64748b" stroke-width="1.2" stroke-linecap="round"/>
+                                                    </svg>
+                                                    <div class="w-60 border-b-[2px] border-slate-900 mb-1.5"></div>
+                                                    <div class="text-[15.5px] font-bold tracking-wider text-slate-900">Founder &amp; Director</div>
+                                                    <div class="text-[14px] italic font-semibold tracking-wide text-slate-800 mt-0.5 font-serif">President</div>
+                                                </div>
+                                                <div class="flex flex-col items-center justify-center mb-5 text-slate-900">
+                                                    <div class="flex items-center gap-2 text-[16.5px] font-medium tracking-wide">
+                                                        <svg class="w-6 h-6 text-slate-800" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="17" x2="20" y2="17"/><path d="M12 2a15.3 15.3 0 0 1 4.5 10 15.3 15.3 0 0 1-4.5 10 15.3 15.3 0 0 1-4.5-10 15.3 15.3 0 0 1 4.5-10z"/></svg>
+                                                        <span>www.codeanvil.in</span>
+                                                    </div>
+                                                    <div class="text-[12.5px] font-semibold tracking-[0.08em] text-slate-900 uppercase mt-1">CONTACT@CODEANVIL.IN</div>
+                                                </div>
+                                            </div>
+                                            <div id="cert-udyam-line" class="hidden text-center text-[11px] text-slate-600 mt-2 tracking-wide"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ================= ADMIN ================= -->
+    <section id="view-admin" class="hidden flex-grow py-10 bg-slate-900 text-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/20 text-red-400 text-xs font-bold uppercase mb-2"><i class="fa-solid fa-user-shield"></i> Secret Route: /admin</div>
+                    <h1 class="text-2xl sm:text-3xl font-black">CodeAnvil Admin Control Center</h1>
+                    <p class="text-slate-400 text-sm">Manage Interns, verify ₹99 UPI UTR numbers (<span class="font-mono text-amber-400">9839411035@ptsbi</span>), and issue certificates.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-3">
+                    <button onclick="navigateTo('home')" class="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-xs font-bold">&larr; Exit Admin</button>
+                    <button onclick="logoutStudent()" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-xs font-bold">Logout</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="bg-slate-800/90 border border-slate-700 p-5 rounded-2xl"><div class="text-xs text-slate-400 font-semibold">Total Registered Interns</div><div id="admin-stat-total" class="text-3xl font-black text-white mt-1">0</div></div>
+                <div class="bg-slate-800/90 border border-slate-700 p-5 rounded-2xl"><div class="text-xs text-slate-400 font-semibold">Tasks Submitted</div><div id="admin-stat-tasks" class="text-3xl font-black text-amber-400 mt-1">0</div></div>
+                <div class="bg-slate-800/90 border border-slate-700 p-5 rounded-2xl"><div class="text-xs text-slate-400 font-semibold">Pending UTR Approval</div><div id="admin-stat-pending" class="text-3xl font-black text-orange-400 mt-1">0</div></div>
+                <div class="bg-slate-800/90 border border-slate-700 p-5 rounded-2xl"><div class="text-xs text-slate-400 font-semibold">Certificates Issued (₹99 Paid)</div><div id="admin-stat-paid" class="text-3xl font-black text-emerald-400 mt-1">0</div></div>
+            </div>
+
+            <div class="bg-slate-800/90 border border-slate-700 rounded-2xl p-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                    <div>
+                        <h3 class="font-bold text-base text-white flex items-center gap-2"><i class="fa-solid fa-image text-amber-400"></i> Custom CodeAnvil Logo (Optional)</h3>
+                        <p class="text-xs text-slate-400">Upload your own PNG/JPG logo from your phone/PC to replace the default CodeAnvil logo on the certificate.</p>
+                    </div>
+                    <button onclick="resetCustomLogos()" class="px-3 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-xs font-bold text-slate-200 self-start sm:self-auto">Reset to Default Logo</button>
+                </div>
+                <input type="file" accept="image/*" onchange="uploadCustomCertLogo(event)" class="text-[11px] text-slate-300 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:bg-amber-500 file:text-slate-950 file:font-bold cursor-pointer">
+            </div>
+
+            <div class="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden shadow-xl">
+                <div class="p-5 border-b border-slate-700 flex flex-col sm:flex-row sm:items-center justify-between gap-3"><h3 class="font-bold text-lg">Registered Interns &amp; Payment Approvals</h3><div class="flex flex-wrap items-center gap-2"><input id="admin-search" oninput="renderAdminTable()" type="search" placeholder="Search name, email, ID, UTR..." class="px-3 py-2 rounded-lg bg-slate-900 border border-slate-600 text-xs text-white placeholder-slate-500 w-56"><button onclick="exportInternsCSV()" class="px-3 py-2 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs"><i class="fa-solid fa-file-csv"></i> Export CSV</button></div></div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-sm">
+                        <thead><tr class="bg-slate-900/60 text-slate-400 text-xs uppercase"><th class="p-4">Intern ID &amp; Name</th><th class="p-4">Domain &amp; Duration</th><th class="p-4">Submitted Tasks</th><th class="p-4">₹99 UPI UTR No.</th><th class="p-4">Payment Status</th><th class="p-4 text-right">Actions</th></tr></thead>
+                        <tbody id="admin-interns-tbody" class="divide-y divide-slate-700/70"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- AUTH MODAL -->
+    <div id="auth-modal" class="fixed inset-0 z-50 bg-slate-950/75 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-200 relative max-h-[92vh] overflow-y-auto">
+            <button onclick="closeAuthModal()" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            <div class="flex gap-2 p-1 bg-slate-100 rounded-xl mb-6 mr-10">
+                <button id="tab-btn-signup" onclick="switchAuthTab('signup')" class="flex-1 py-2 rounded-lg font-bold text-sm">New Intern Signup</button>
+                <button id="tab-btn-login" onclick="switchAuthTab('login')" class="flex-1 py-2 rounded-lg font-bold text-sm">Existing Login</button>
+            </div>
+            <form id="form-signup" onsubmit="handleSignup(event)" class="space-y-3.5 text-sm">
+                <div><label class="block text-xs font-bold text-slate-700 mb-1">Full Name (For Certificate) *</label><input type="text" id="signup-name" required placeholder="e.g. Rahul Kumar" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-medium"></div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div><label class="block text-xs font-bold text-slate-700 mb-1">Email Address *</label><input type="email" id="signup-email" required placeholder="you@college.edu" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-medium"></div>
+                    <div><label class="block text-xs font-bold text-slate-700 mb-1">WhatsApp No. *</label><input type="tel" id="signup-phone" required placeholder="9876543210" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-medium"></div>
+                </div>
+                <div><label class="block text-xs font-bold text-slate-700 mb-1">College / Institute Name *</label><input type="text" id="signup-college" required placeholder="e.g. B.Tech Institute" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-medium"></div>
+                <div><label class="block text-xs font-bold text-slate-700 mb-1">Select Internship Domain *</label><select id="signup-domain" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-semibold bg-white"></select></div>
+                <div><label class="block text-xs font-bold text-slate-700 mb-1">Create Password *</label><input type="password" id="signup-password" required minlength="6" placeholder="Min 6 characters" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-medium"></div>
+                <label class="flex items-start gap-2 text-xs text-slate-600 leading-relaxed">
+                    <input type="checkbox" id="signup-agree" required class="mt-0.5 w-4 h-4 accent-amber-500">
+                    <span>I have read and agree to the <a href="#" onclick="openLegal('terms'); return false;" class="text-amber-600 underline font-semibold">Terms</a>, <a href="#" onclick="openLegal('refund'); return false;" class="text-amber-600 underline font-semibold">Refund Policy</a> and <a href="#" onclick="openLegal('privacy'); return false;" class="text-amber-600 underline font-semibold">Privacy Policy</a>.</span>
+                </label>
+                <button type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-extrabold shadow-lg transition">Create Account &amp; Get Offer Letter</button>
+            </form>
+            <form id="form-login" onsubmit="handleLogin(event)" class="space-y-4 text-sm hidden">
+                <div><label class="block text-xs font-bold text-slate-700 mb-1">Registered Email Address *</label><input type="email" id="login-email" required placeholder="you@college.edu" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-medium"></div>
+                <div><label class="block text-xs font-bold text-slate-700 mb-1">Password *</label><input type="password" id="login-password" required placeholder="••••••••" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 font-medium"></div>
+                <button type="submit" class="w-full py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-extrabold shadow-lg transition">Login to Student Dashboard</button>
+                <div class="text-center"><button type="button" onclick="handleForgotPassword()" class="text-xs font-bold text-amber-600 hover:underline">Forgot password?</button></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- OFFER LETTER MODAL -->
+    <div id="offer-modal" class="fixed inset-0 z-50 bg-slate-950/75 hidden items-start justify-center p-3 overflow-y-auto">
+        <div class="bg-white rounded-2xl w-full max-w-3xl my-4 shadow-2xl">
+            <div class="flex items-center justify-between p-3 border-b border-slate-200">
+                <div class="font-bold text-sm">Offer Letter Preview</div>
+                <div class="flex gap-2">
+                    <button onclick="downloadOfferLetter()" class="px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold text-xs"><i class="fa-solid fa-download"></i> Download PDF</button>
+                    <button onclick="closeOfferPreview()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+            </div>
+            <div class="p-3 overflow-x-auto"><div id="offer-preview-holder"></div></div>
+        </div>
+    </div>
+    <!-- LEGAL MODAL -->
+    <div id="legal-modal" class="fixed inset-0 z-[55] bg-slate-950/75 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-2xl w-full shadow-2xl flex flex-col max-h-[90vh]">
+            <div class="flex items-center justify-between p-4 border-b border-slate-200">
+                <div class="flex gap-1 p-1 bg-slate-100 rounded-lg text-xs sm:text-sm">
+                    <button id="legal-tab-terms" onclick="switchLegal('terms')" class="px-3 py-1.5 rounded-md font-bold">Terms</button>
+                    <button id="legal-tab-refund" onclick="switchLegal('refund')" class="px-3 py-1.5 rounded-md font-bold">Refund</button>
+                    <button id="legal-tab-privacy" onclick="switchLegal('privacy')" class="px-3 py-1.5 rounded-md font-bold">Privacy</button>
+                </div>
+                <button onclick="closeLegal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div id="legal-content" class="p-5 sm:p-6 overflow-y-auto text-sm text-slate-700 leading-relaxed space-y-3"></div>
+        </div>
+    </div>
+    <div id="review-modal" class="fixed inset-0 z-[56] bg-slate-950/80 hidden items-start justify-center p-3 overflow-y-auto"><div id="review-body" class="bg-slate-800 text-white rounded-2xl w-full max-w-2xl my-4 p-5 space-y-4"></div></div>
+    <a id="wa-float" href="#" target="_blank" rel="noopener" aria-label="WhatsApp support" class="fixed bottom-5 left-5 z-50 w-14 h-14 rounded-full bg-green-500 hover:bg-green-600 text-white text-3xl flex items-center justify-center shadow-xl"><i class="fa-brands fa-whatsapp"></i></a>
+    <div id="offer-capture"></div>
+    <div id="cert-capture"></div>
+
+    <footer class="bg-slate-950 text-slate-400 py-12 border-t border-slate-800 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-4 gap-8 pb-8 border-b border-slate-800">
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2 text-xl font-black text-white"><span class="text-amber-500">CODE</span> <span class="text-red-500">ANVIL</span></div>
+                    <p class="text-xs text-slate-400 leading-relaxed">A virtual internship &amp; skill training platform helping students learn through real-world projects.</p>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-sm mb-3">Internship Domains</h4>
+                    <ul class="space-y-2 text-xs"><li>Web Development Internship</li><li>Python Programming Internship</li><li>Data Science &amp; AI/ML</li><li>Java &amp; Android Development</li></ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-sm mb-3">Quick Links</h4>
+                    <ul class="space-y-2 text-xs">
+                        <li><a href="#" onclick="goSection('how-it-works'); return false;" class="hover:text-amber-400">How Internship Works</a></li>
+                        <li><a href="#" onclick="goSection('verify-section'); return false;" class="hover:text-amber-400">Verify Certificate</a></li>
+                        <li><a href="#" onclick="goSection('faq-section'); return false;" class="hover:text-amber-400">Frequently Asked Questions</a></li>
+                        <li><button onclick="openAuthModal('signup')" class="hover:text-amber-400">Apply for Internship</button></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-bold text-sm mb-3">Contact</h4>
+                    <div class="text-xs text-slate-300 font-semibold space-y-1">
+                        <div><i class="fa-solid fa-globe text-amber-400 mr-1.5"></i> www.codeanvil.in</div>
+                        <div><i class="fa-solid fa-envelope text-amber-400 mr-1.5"></i> contact@codeanvil.in</div>
+                        <div id="footer-udyam"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+                <div>&copy; 2026 CodeAnvil Technologies. All Rights Reserved.</div>
+                <div class="flex flex-wrap items-center gap-4">
+                    <button onclick="openLegal('terms')" class="hover:text-amber-400">Terms &amp; Conditions</button>
+                    <button onclick="openLegal('refund')" class="hover:text-amber-400">Refund Policy</button>
+                    <button onclick="openLegal('privacy')" class="hover:text-amber-400">Privacy Policy</button>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // ====== EDIT THIS: paste your Firebase web-app config (Project settings > Your apps) ======
+        // Admin access. "email": only the login ADMIN_EMAIL is admin (active now).
+        // "role": admin = a Firestore doc admins/<uid> (saved for later: set ADMIN_MODE = "role" and swap the isAdmin() function in firestore.rules).
+        const ADMIN_EMAIL = "admin@codeanvil.in";
+        const ADMIN_MODE = "email";
+        const FIREBASE_CONFIG = {
+            apiKey: "AIzaSyAxWrqLxOZt_GQfy1ZZqxFr8l_6ewf-8jc",
+            authDomain: "code-anvil-aabe6.firebaseapp.com",
+            projectId: "code-anvil-aabe6",
+            storageBucket: "code-anvil-aabe6.firebasestorage.app",
+            messagingSenderId: "902284948226",
+            appId: "1:902284948226:web:731548c428f5884b39881b"
+        };
+
+        // ====== EDIT THIS: your real business details ======
+        // Put your real Udyam registration number here. It then shows as plain text on the top bar,
+        // certificate, offer letter and footer. Leave "" to hide it everywhere.
+        const BUSINESS = { name: "CodeAnvil", website: "www.codeanvil.in", email: "contact@codeanvil.in", udyamNo: "", whatsapp: "919839411035" }; // whatsapp: country code + number, no "+"
+
+        const DOMAINS = [
+            { title: "WEB DEVELOPMENT", icon: "fa-code", color: "from-amber-500 to-orange-600", desc: "Build responsive websites, portfolio apps & full-stack web projects using HTML, CSS, JS & React." },
+            { title: "PYTHON PROGRAMMING", icon: "fa-brands fa-python", color: "from-blue-500 to-indigo-600", desc: "Automate workflows, build CLI/GUI tools, and master data structures using modern Python." },
+            { title: "DATA SCIENCE & AI/ML", icon: "fa-brain", color: "from-emerald-500 to-teal-600", desc: "Train machine learning models, perform exploratory data analysis, and deploy predictive AI apps." },
+            { title: "JAVA DEVELOPMENT", icon: "fa-brands fa-java", color: "from-rose-500 to-red-600", desc: "Develop object-oriented enterprise applications and backend systems with Core & Advanced Java." },
+            { title: "ANDROID APP DEVELOPMENT", icon: "fa-brands fa-android", color: "from-green-500 to-emerald-600", desc: "Create modern mobile applications with intuitive UI, API integration, and state management." },
+            { title: "CYBER SECURITY", icon: "fa-shield-halved", color: "from-purple-500 to-violet-600", desc: "Learn network security fundamentals, vulnerability scanning, encryption & ethical defense." },
+            { title: "UI/UX DESIGNING", icon: "fa-pen-ruler", color: "from-pink-500 to-rose-600", desc: "Design high-converting wireframes, design systems, and interactive mobile/web prototypes." },
+            { title: "C++ PROGRAMMING", icon: "fa-microchip", color: "from-cyan-500 to-blue-600", desc: "Master high-performance system programming, OOP concepts, and algorithmic problem solving." }
+        ];
+
+        // Three tasks per domain: shown on the dashboard and listed in the offer letter.
+        const TASKS = {
+            "WEB DEVELOPMENT": [
+                { t: "Personal Portfolio Website", d: "Build a responsive multi-section portfolio (About, Skills, Projects, Contact) with HTML, CSS and JavaScript, and host it live (GitHub Pages or Netlify)." },
+                { t: "Interactive Web App", d: "Build an app such as a to-do list, weather app or expense tracker that uses JavaScript DOM handling plus local storage or a public API." },
+                { t: "Full-Stack Capstone", d: "Build a small full-stack project (blog, notes or product catalogue) with a frontend and a backend or Firebase that saves user data. Deploy it live." }
+            ],
+            "PYTHON PROGRAMMING": [
+                { t: "Command-Line Utility", d: "Build a CLI tool such as a file organizer, password generator or unit converter, using functions and proper error handling." },
+                { t: "Automation / Data Script", d: "Automate a real task: process a CSV file, collect data from a public source or generate a report. Include clear output and comments." },
+                { t: "Capstone Application", d: "Build a Tkinter or Flask app (expense tracker, quiz app, etc.) with file or database storage and a README explaining how to run it." }
+            ],
+            "DATA SCIENCE & AI/ML": [
+                { t: "Data Analysis Notebook", d: "Take a public dataset (Kaggle or UCI), clean it, make charts with Pandas and Matplotlib, and write down your key insights." },
+                { t: "Machine Learning Model", d: "Train and evaluate a classification or regression model on a dataset of your choice and report accuracy or error metrics." },
+                { t: "Deployed Predictor", d: "Wrap your trained model in a simple Streamlit or Flask app that takes input and returns a prediction. Add a README." }
+            ],
+            "JAVA DEVELOPMENT": [
+                { t: "OOP Console Application", d: "Build a console app (library or bank management) using classes, inheritance, interfaces and exception handling." },
+                { t: "Data-Driven Application", d: "Extend a Java app with collections, file storage or JDBC and a menu-driven flow for adding, searching and updating records." },
+                { t: "Capstone Project", d: "Build a student management system or a small Spring Boot REST API, with clear documentation and sample requests." }
+            ],
+            "ANDROID APP DEVELOPMENT": [
+                { t: "Multi-Screen UI App", d: "Build an app with at least 3 screens using layouts, RecyclerView and navigation (for example a profile or to-do app)." },
+                { t: "API-Connected App", d: "Build an app that fetches and shows data from a public API (weather or news) with loading and error states." },
+                { t: "Capstone App", d: "Build a complete app with local storage (Room) or Firebase and a clean UI. Share the source code and screenshots." }
+            ],
+            "CYBER SECURITY": [
+                { t: "Vulnerability Report", d: "Write a short report on the OWASP Top 10, explaining each risk with an example and how to prevent it." },
+                { t: "Practice Lab Exercises", d: "Complete a set of exercises on a legal practice platform (TryHackMe, or DVWA running on your own machine) and document your steps and learnings." },
+                { t: "Security Review Capstone", d: "Review a small web app that you own: check authentication, input handling and configuration, and publish findings with fixes. Only test systems you own or have permission to test." }
+            ],
+            "UI/UX DESIGNING": [
+                { t: "Redesign Case Study", d: "Pick one screen of an existing app, list its usability problems and present a redesign with before and after views." },
+                { t: "Wireframes & Prototype", d: "Create low-fidelity wireframes and a clickable Figma prototype for a mobile app idea of your own." },
+                { t: "Design System Capstone", d: "Create a mini design system (colours, typography, components) and design 5 or more connected screens. Share the Figma link and a short case study." }
+            ],
+            "C++ PROGRAMMING": [
+                { t: "Problem-Solving Set", d: "Solve at least 15 array and string problems with clean code and a note on time complexity for each." },
+                { t: "OOP Project", d: "Build a console app (inventory or hostel management) using classes, inheritance and file handling." },
+                { t: "Data Structures Capstone", d: "Implement a project such as a graph path-finder or a contact book using STL or your own data structures, with a README and sample runs." }
+            ]
+        };
+        function tasksFor(domain) { return TASKS[domain] || TASKS["WEB DEVELOPMENT"]; }
+
+        // Legal text. Review these with your own situation before going live.
+        function getLegal(tab) {
+            const mail = BUSINESS.email;
+            if (tab === 'refund') return `
+                <h3 class="text-lg font-black text-slate-900">Refund Policy</h3>
+                <p class="text-xs text-slate-500">Last updated: October 2026</p>
+                <p><strong>Free items.</strong> Registration and your Internship Offer Letter are free, so there is nothing to refund for them.</p>
+                <p><strong>Certificate fee (₹99).</strong> This one-time fee covers project evaluation, QR verification hosting and certificate issuance. Once your certificate has been issued, the fee is non-refundable.</p>
+                <p><strong>You can ask for a refund if:</strong></p>
+                <ul class="list-disc ml-5 space-y-1"><li>you paid the fee more than once by mistake,</li><li>you paid a wrong amount, or</li><li>your submission met the requirements but we could not issue the certificate.</li></ul>
+                <p><strong>If your tasks need changes,</strong> you can improve and resubmit them. The same fee covers re-evaluation.</p>
+                <p><strong>How to request.</strong> Email <strong>${mail}</strong> within 7 days of payment with your Intern ID, UTR number and payment screenshot. Approved refunds are sent to the original UPI account within 7 to 10 working days.</p>`;
+            if (tab === 'privacy') return `
+                <h3 class="text-lg font-black text-slate-900">Privacy Policy</h3>
+                <p class="text-xs text-slate-500">Last updated: October 2026</p>
+                <p><strong>What we collect.</strong> Your name, email, WhatsApp number, college, chosen domain, the project links you submit and your payment reference (UTR) number. We do not collect your card or bank login details.</p>
+                <p><strong>Why we use it.</strong> To create your account, issue your offer letter and certificate, review your tasks, confirm your payment and reply to your queries.</p>
+                <p><strong>What is shown publicly.</strong> When someone enters your Intern ID on the Verify page or scans the QR on your certificate, they can see your name, Intern ID, domain and internship dates. Your email, phone and project links are not shown there.</p>
+                <p><strong>Storage and sharing.</strong> Your data is stored using Google Firebase. We do not sell your data. We may share it only if the law requires us to.</p>
+                <p><strong>Your choices.</strong> You can ask us to correct or delete your data by emailing <strong>${mail}</strong>. If we delete your record, your certificate can no longer be verified online.</p>`;
+            return `
+                <h3 class="text-lg font-black text-slate-900">Terms &amp; Conditions</h3>
+                <p class="text-xs text-slate-500">Last updated: October 2026</p>
+                <ol class="list-decimal ml-5 space-y-2">
+                    <li><strong>About the program.</strong> ${BUSINESS.name} is a private online platform that offers virtual internships and skill training. The certificate is issued by ${BUSINESS.name}. It is not a degree or a government, university or AICTE credential, and it does not guarantee a job, stipend or academic credit.</li>
+                    <li><strong>Nature of the internship.</strong> The internship is remote, unpaid and runs for about 4 weeks. It does not create an employment relationship.</li>
+                    <li><strong>Your details.</strong> You must give accurate information. The name you enter is the name printed on your certificate.</li>
+                    <li><strong>Your work.</strong> All three projects must be your own original work. Copied or plagiarised work can be rejected.</li>
+                    <li><strong>Certificate.</strong> A certificate is issued after you submit all 3 tasks and your ₹99 fee is confirmed. We can revoke a certificate if it was obtained through false information or plagiarism.</li>
+                    <li><strong>Your account.</strong> Keep your login details private. You are responsible for activity on your account.</li>
+                    <li><strong>Fees.</strong> Registration and the offer letter are free. The certificate fee is covered by the Refund Policy.</li>
+                    <li><strong>Changes.</strong> We may update these terms. The version on this page applies.</li>
+                    <li><strong>Contact.</strong> Questions? Email <strong>${mail}</strong>.</li>
+                </ol>`;
+        }
+
+        let app, db, auth, currentStudent = null, isAdminUser = false, authReady = false, pendingAdmin = false, pendingSignup = false;
+        let unsubIntern = null, unsubAll = null, allInterns = [];
+        const esc = (v) => String(v ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const safeUrl = (u) => { try { const x = new URL(u); return (x.protocol === 'https:' || x.protocol === 'http:') ? x.href : ''; } catch (e) { return ''; } };
+        const fmtCertDate = (d) => d.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase();
+        const authMsg = (e) => ({ 'auth/email-already-in-use': 'This email is already registered. Please log in.', 'auth/weak-password': 'Password must be at least 6 characters.',
+            'auth/invalid-credential': 'Incorrect email or password.', 'auth/wrong-password': 'Incorrect email or password.', 'auth/user-not-found': 'Incorrect email or password.',
+            'auth/too-many-requests': 'Too many attempts. Please wait a few minutes.', 'auth/network-request-failed': 'Network error. Check your connection.' }[e.code] || 'Something went wrong. Please try again.');
+        const $ = (id) => document.getElementById(id);
+        async function checkAdmin(user) {
+            if (ADMIN_MODE === 'email') return (user.email || '').toLowerCase() === ADMIN_EMAIL;
+            try { return (await getDoc(doc(db, 'admins', user.uid))).exists(); } catch (e) { return false; }
+        }
+        const fmtDate = (iso) => new Date(iso || Date.now()).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+
+        function initStatic() {
+            const opts = DOMAINS.map(d => `<option value="${d.title}">${d.title}</option>`).join('');
+            $('signup-domain').innerHTML = opts; $('edit-domain').innerHTML = opts;
+            $('domains-grid').innerHTML = DOMAINS.map(d => `
+                <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm hover:shadow-xl transition flex flex-col justify-between group">
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-gradient-to-br ${d.color} text-white flex items-center justify-center text-xl shadow-md mb-4 group-hover:scale-110 transition"><i class="fa-solid ${d.icon}"></i></div>
+                        <div class="flex items-center gap-2 text-[11px] font-bold text-slate-500 uppercase mb-1"><span><i class="fa-regular fa-clock text-amber-500"></i> 4 Weeks</span> &bull; <span><i class="fa-solid fa-laptop-code text-emerald-600"></i> Remote</span></div>
+                        <h3 class="font-black text-lg text-slate-900">${d.title}</h3>
+                        <p class="text-xs text-slate-600 mt-2 leading-relaxed">${d.desc}</p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-100">
+                        <div class="flex items-center justify-between text-xs mb-3"><span class="text-slate-500 font-medium">Offer Letter: <strong class="text-emerald-600">Free</strong></span><span class="text-slate-500 font-medium">Certificate: <strong class="text-slate-900">₹99</strong></span></div>
+                        <button onclick="selectDomainAndSignup('${d.title}')" class="w-full py-2.5 rounded-xl bg-slate-900 group-hover:bg-amber-500 group-hover:text-slate-950 text-white font-bold text-xs uppercase tracking-wider transition">Apply Now &rarr;</button>
+                    </div>
+                </div>`).join('');
+            if (BUSINESS.udyamNo) {
+                $('top-udyam-line').innerHTML = `<strong>Udyam Reg. No.:</strong> ${BUSINESS.udyamNo}`; $('top-udyam-line').classList.remove('hidden');
+                $('footer-udyam').textContent = `Udyam Reg. No.: ${BUSINESS.udyamNo}`;
+            }
+            if (BUSINESS.whatsapp) $('wa-float').href = `https://wa.me/${BUSINESS.whatsapp}?text=${encodeURIComponent('Hello CodeAnvil, I need help with my internship.')}`; else $('wa-float').classList.add('hidden');
+        }
+
+        function initFirebase() {
+            initStatic(); updateNavbarAuthUI();
+            let cfg = FIREBASE_CONFIG;
+            try { if (typeof __firebase_config !== 'undefined' && __firebase_config) cfg = JSON.parse(__firebase_config); } catch (e) {}
+            if (!cfg.apiKey || !cfg.projectId) { authReady = true; showToast("Firebase configuration is missing. Please fill in FIREBASE_CONFIG in the code.", "error"); return; }
+            app = initializeApp(cfg); auth = getAuth(app); db = getFirestore(app);
+            onAuthStateChanged(auth, onAuth);
+            checkUrlForAdminRoute(); checkVerifyParam();
+        }
+
+        async function onAuth(user) {
+            if (unsubIntern) unsubIntern(); if (unsubAll) unsubAll(); unsubIntern = unsubAll = null;
+            if (!user) {
+                currentStudent = null; isAdminUser = false; allInterns = []; updateNavbarAuthUI();
+                if (!$('view-admin').classList.contains('hidden') || !$('view-dashboard').classList.contains('hidden')) navigateTo('home');
+            } else {
+                isAdminUser = await checkAdmin(user);
+                if (isAdminUser) unsubAll = onSnapshot(collection(db, 'interns'), (snap) => {
+                    allInterns = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a, b) => String(b.createdAt).localeCompare(String(a.createdAt)));
+                    renderAdminTable();
+                }, (e) => console.error(e));
+                unsubIntern = onSnapshot(doc(db, 'interns', user.uid), (snap) => {
+                    if (!snap.exists()) {
+                        currentStudent = null;
+                        if (!isAdminUser && !pendingSignup) { showToast("No intern profile found for this account.", "error"); signOut(auth); }
+                    } else {
+                        currentStudent = { id: snap.id, ...snap.data() };
+                        if (!$('view-dashboard').classList.contains('hidden')) syncStudentDashboardUI();
+                    }
+                    updateNavbarAuthUI();
+                }, (e) => console.error(e));
+            }
+            authReady = true; updateNavbarAuthUI();
+            if (pendingAdmin) { pendingAdmin = false; navigateTo('admin'); }
+        }
+
+        // ---------- Navigation ----------
+        window.goSection = function(id) { navigateTo('home'); setTimeout(() => $(id).scrollIntoView({ behavior: 'smooth' }), 80); };
+        window.navigateTo = function(view) {
+            if (view === 'admin') {
+                if (!authReady) { pendingAdmin = true; return; }
+                if (!isAdminUser) { showToast(auth && auth.currentUser ? "This account is not an admin." : "Admin login required.", "error"); if (!(auth && auth.currentUser)) openAuthModal('login'); view = 'home'; }
+            }
+            ['view-home', 'view-dashboard', 'view-admin'].forEach(v => $(v).classList.add('hidden'));
+            if (view === 'admin') { $('view-admin').classList.remove('hidden'); renderAdminTable(); }
+            else if (view === 'dashboard' && currentStudent) { $('view-dashboard').classList.remove('hidden'); syncStudentDashboardUI(); }
+            else { $('view-home').classList.remove('hidden'); }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+        function checkUrlForAdminRoute() {
+            const h = window.location.hash.toLowerCase(), p = window.location.pathname.toLowerCase();
+            if (p.endsWith('/admin') || h === '#admin' || h === '#/admin') window.navigateTo('admin');
+        }
+        window.addEventListener('hashchange', checkUrlForAdminRoute);
+        window.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === 'a') { e.preventDefault(); window.location.hash = '#/admin'; window.navigateTo('admin'); }
+        });
+        // QR links look like /?verify=CA1234: open the verify result straight away
+        function checkVerifyParam() {
+            const v = new URLSearchParams(window.location.search).get('verify');
+            if (!v) return;
+            $('verify-input').value = v.trim().toUpperCase().slice(0, 20);
+            setTimeout(() => { $('verify-section').scrollIntoView({ behavior: 'smooth' }); handleVerifySearch(); }, 200);
+        }
+
+        // ---------- Auth ----------
+        window.openAuthModal = function(tab = 'signup') { $('auth-modal').classList.remove('hidden'); $('auth-modal').classList.add('flex'); switchAuthTab(tab); };
+        window.closeAuthModal = function() { $('auth-modal').classList.add('hidden'); $('auth-modal').classList.remove('flex'); };
+        window.switchAuthTab = function(tab) {
+            const s = tab === 'signup';
+            $('form-signup').classList.toggle('hidden', !s); $('form-login').classList.toggle('hidden', s);
+            $('tab-btn-signup').className = "flex-1 py-2 rounded-lg font-bold text-sm transition " + (s ? "bg-white shadow text-slate-900" : "text-slate-600 hover:text-slate-900");
+            $('tab-btn-login').className = "flex-1 py-2 rounded-lg font-bold text-sm transition " + (!s ? "bg-white shadow text-slate-900" : "text-slate-600 hover:text-slate-900");
+        };
+        window.selectDomainAndSignup = function(title) {
+            if (currentStudent) { navigateTo('dashboard'); return; }
+            openAuthModal('signup'); $('signup-domain').value = title;
+        };
+
+        window.handleSignup = async function(e) {
+            e.preventDefault();
+            if (!auth) { showToast("Service not configured yet.", "error"); return; }
+            const btn = e.submitter; if (btn) btn.disabled = true;
+            pendingSignup = true; let cred = null;
+            try {
+                cred = await createUserWithEmailAndPassword(auth, $('signup-email').value.trim(), $('signup-password').value);
+                if (ADMIN_MODE === 'email' && cred.user.email.toLowerCase() === ADMIN_EMAIL) { // admin account: no intern profile needed
+                    isAdminUser = true; closeAuthModal(); updateNavbarAuthUI(); showToast("Admin account created.", "success"); navigateTo('admin'); return;
+                }
+                const now = new Date(), end = new Date(now); end.setDate(end.getDate() + 28); // 4 weeks from signup
+                const intern = {
+                    uid: cred.user.uid, taskStatus: "none", internId: 'CA' + Math.floor(1000 + Math.random() * 9000),
+                    fullName: $('signup-name').value.trim(), email: cred.user.email.toLowerCase(), phone: $('signup-phone').value.trim(),
+                    college: $('signup-college').value.trim(), domain: $('signup-domain').value,
+                    startDate: fmtCertDate(now), endDate: fmtCertDate(end),
+                    tasks: { task1: "", task2: "", task3: "", completed: false },
+                    paymentStatus: "unpaid", utrNumber: "", createdAt: now.toISOString()
+                };
+                await setDoc(doc(db, 'interns', cred.user.uid), intern);
+                currentStudent = { id: cred.user.uid, ...intern };
+                closeAuthModal(); updateNavbarAuthUI();
+                showToast(`Welcome ${intern.fullName}! Assigned Intern ID: ${intern.internId}`, "success");
+                navigateTo('dashboard'); setTimeout(openOfferPreview, 400);
+            } catch (err) {
+                console.error(err); showToast(authMsg(err), "error");
+                if (err.code === 'auth/email-already-in-use') { switchAuthTab('login'); $('login-email').value = $('signup-email').value.trim(); }
+                else if (cred) { try { await cred.user.delete(); } catch (x) {} } // profile not saved: remove the half-created account so they can retry
+            } finally { pendingSignup = false; if (btn) btn.disabled = false; }
+        };
+
+        window.handleLogin = async function(e) {
+            e.preventDefault();
+            if (!auth) { showToast("Service not configured yet.", "error"); return; }
+            try {
+                const c = await signInWithEmailAndPassword(auth, $('login-email').value.trim(), $('login-password').value);
+                closeAuthModal();
+                if (await checkAdmin(c.user)) { isAdminUser = true; navigateTo('admin'); return; }
+                const s = await getDoc(doc(db, 'interns', c.user.uid));
+                if (!s.exists()) return; // onAuth signs out accounts without a profile
+                currentStudent = { id: s.id, ...s.data() }; updateNavbarAuthUI();
+                showToast(`Welcome back, ${currentStudent.fullName}!`, "success"); navigateTo('dashboard');
+            } catch (err) { showToast(authMsg(err), "error"); }
+        };
+        window.handleForgotPassword = async function() {
+            const email = $('login-email').value.trim();
+            if (!email) { showToast("Please enter your email above first.", "info"); return; }
+            if (!auth) return;
+            try { await sendPasswordResetEmail(auth, email); } catch (err) { if (err.code === 'auth/invalid-email') { showToast("Please enter a valid email address.", "error"); return; } }
+            showToast("If this email is registered, a password reset link has been sent.", "success");
+        };
+        window.logoutStudent = async function() { if (auth) await signOut(auth); navigateTo('home'); showToast("Logged out successfully.", "info"); };
+        window.sendProofWhatsApp = function() {
+            const s = currentStudent; if (!s) return;
+            const t = `Hello CodeAnvil, I paid Rs 99 for my certificate.\nName: ${s.fullName}\nIntern ID: ${s.internId}\nUTR: ${$('utr-input').value.trim() || '(add UTR)'}\nPayment screenshot attached.`;
+            window.open(`https://wa.me/${BUSINESS.whatsapp}?text=${encodeURIComponent(t)}`, '_blank', 'noopener');
+        };
+
+
+        // ---------- Legal pages ----------
+        window.switchLegal = function(tab) {
+            $('legal-content').innerHTML = getLegal(tab);
+            $('legal-content').scrollTop = 0;
+            ['terms', 'refund', 'privacy'].forEach(t => {
+                $(`legal-tab-${t}`).className = "px-3 py-1.5 rounded-md font-bold " + (t === tab ? "bg-white shadow text-slate-900" : "text-slate-600 hover:text-slate-900");
+            });
+        };
+        window.openLegal = function(tab = 'terms') {
+            $('legal-modal').classList.remove('hidden'); $('legal-modal').classList.add('flex'); switchLegal(tab);
+        };
+        window.closeLegal = function() { $('legal-modal').classList.add('hidden'); $('legal-modal').classList.remove('flex'); };
+
+        function updateNavbarAuthUI() {
+            const logout = `<button onclick="logoutStudent()" class="px-3 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs">Logout</button>`;
+            $('nav-auth-area').innerHTML = isAdminUser
+                ? `<button onclick="navigateTo('admin')" class="px-4 py-2.5 rounded-xl bg-red-500 hover:bg-red-600 text-white font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow"><i class="fa-solid fa-user-shield"></i> Admin Panel</button>` + logout
+                : currentStudent
+                ? `<button onclick="navigateTo('dashboard')" class="px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-extrabold text-xs sm:text-sm flex items-center gap-2 shadow"><i class="fa-solid fa-gauge-high"></i> Dashboard (${esc(currentStudent.internId)})</button>` + logout
+                : `<button onclick="openAuthModal('login')" class="px-4 py-2 text-sm font-bold text-slate-700 hover:text-amber-600 transition">Intern Login</button>
+                   <button onclick="openAuthModal('signup')" class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm shadow-md transition flex items-center gap-2"><span>Apply Now</span> <i class="fa-solid fa-arrow-right text-amber-400 text-xs"></i></button>`;
+        }
+
+
+        function syncStudentDashboardUI() {
+            const s = currentStudent; if (!s) return;
+            $('dash-intern-id').textContent = s.internId; $('dash-student-name').textContent = s.fullName;
+            $('dash-domain').textContent = s.domain; $('dash-duration').textContent = `${s.startDate} TO ${s.endDate}`;
+            $('edit-name').value = s.fullName; $('edit-domain').value = s.domain; $('edit-college').value = s.college || '';
+            $('edit-start-date').value = s.startDate; $('edit-end-date').value = s.endDate;
+            $('task1-link').value = s.tasks?.task1 || ''; $('task2-link').value = s.tasks?.task2 || ''; $('task3-link').value = s.tasks?.task3 || '';
+            tasksFor(s.domain).forEach((t, n) => {
+                $(`task${n + 1}-label`).textContent = `Task ${n + 1}: ${t.t} (GitHub / Live Link) *`;
+                $(`task${n + 1}-desc`).textContent = t.d;
+            });
+
+            const tasksDone = !!s.tasks?.completed, isPaid = s.paymentStatus === 'paid', isPending = s.paymentStatus === 'pending_verification';
+
+            const tb = $('dash-task-badge'), tp = $('task-status-pill');
+            const ts = s.taskStatus || 'none', tApproved = ts === 'approved';
+            tb.textContent = tApproved ? "Approved ✓" : ts === 'submitted' ? "Under Review" : ts === 'rejected' ? "Changes Needed" : "Pending Submission";
+            tb.className = "font-bold mt-0.5 " + (tasksDone ? "text-emerald-400" : "text-amber-400");
+            tp.textContent = tApproved ? "Approved ✓" : tasksDone ? "Submitted" : "0/3 Done";
+            tp.className = "text-xs font-bold px-2.5 py-1 rounded-full " + (tasksDone ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800");
+
+            $('payment-locked-overlay').classList.toggle('hidden', tasksDone);
+            $('payment-active-box').classList.toggle('hidden', !tasksDone || isPaid);
+            $('payment-verified-box').classList.toggle('hidden', !(tasksDone && isPaid));
+            if (isPaid) $('verified-utr-display').textContent = s.utrNumber;
+            if (s.utrNumber && !isPaid) $('utr-input').value = s.utrNumber;
+
+            const tn = $('task-review-note'); tn.classList.toggle('hidden', !(ts === 'rejected' && s.taskNote)); tn.textContent = s.taskNote ? "Admin note: " + s.taskNote : '';
+            ['task1-link', 'task2-link', 'task3-link'].forEach(id => $(id).disabled = tApproved); $('task-submit-btn').disabled = tApproved;
+            const pn = $('payment-note'); pn.classList.toggle('hidden', !(s.paymentStatus === 'unpaid' && s.paymentNote)); pn.textContent = s.paymentNote ? "Admin note: " + s.paymentNote : '';
+            $('proof-status').textContent = s.proofAt ? "Screenshot uploaded ✓" : '';
+            const pb = $('dash-payment-badge');
+            if (!tasksDone) { pb.textContent = "Complete Tasks First"; pb.className = "font-bold text-slate-400 mt-0.5"; }
+            else if (isPaid) { pb.textContent = "₹99 Paid ✓"; pb.className = "font-bold text-emerald-400 mt-0.5"; }
+            else if (isPending) { pb.textContent = "Verification Pending"; pb.className = "font-bold text-amber-400 mt-0.5"; }
+            else { pb.textContent = "Unpaid (₹99)"; pb.className = "font-bold text-rose-400 mt-0.5"; }
+
+            const unlocked = tApproved && isPaid, cb = $('dash-cert-badge');
+            $('cert-lock-overlay').classList.toggle('hidden', unlocked);
+            $('btn-print-cert').disabled = !unlocked; $('btn-download-cert').disabled = !unlocked;
+            cb.textContent = unlocked ? "Unlocked & Ready ✓" : "Locked";
+            cb.className = "font-bold mt-0.5 " + (unlocked ? "text-emerald-400" : "text-slate-400");
+            $('cert-access-subtitle').textContent = unlocked ? "Your certificate is ready. Use the Print or Download PDF button." : "Complete your tasks and ₹99 UPI payment to unlock Print & Download.";
+            if (isPending) $('cert-lock-reason').innerHTML = `Your ₹99 UTR (<strong>${esc(s.utrNumber)}</strong>) has been submitted and is awaiting Admin Approval.`;
+            else if (isPaid && !tApproved) $('cert-lock-reason').textContent = "Payment confirmed. Waiting for admin to approve your tasks.";
+
+            populateCertificate(s); fitCertificate();
+        }
+        function fitCertificate() {
+            const w = $('certificate-print-container'), c = $('certificate-canvas'); if (!w || !c) return;
+            const avail = w.clientWidth; if (avail <= 0) return;
+            const s = Math.min(1, avail / 1122);
+            c.style.transform = `scale(${s})`; c.style.marginLeft = s === 1 ? Math.max(0, (avail - 1122) / 2) + 'px' : '0';
+            w.style.height = Math.round(793 * s) + 'px';
+        }
+        window.addEventListener('resize', () => fitCertificate());
+
+        function populateCertificate(s) {
+            $('cert-top-id').textContent = s.internId; $('cert-bottom-id').textContent = s.internId;
+            $('cert-student-name').textContent = s.fullName; $('cert-domain-name').textContent = s.domain;
+            $('cert-start-date').textContent = s.startDate; $('cert-end-date').textContent = s.endDate;
+            const u = $('cert-udyam-line');
+            if (BUSINESS.udyamNo) { u.textContent = `${BUSINESS.name} · Udyam Registration No.: ${BUSINESS.udyamNo}`; u.classList.remove('hidden'); } else u.classList.add('hidden');
+            const qr = $('cert-qr-box'); qr.innerHTML = "";
+            try { new QRCode(qr, { text: `https://${BUSINESS.website}/?verify=${encodeURIComponent(s.internId)}`, width: 96, height: 96, colorDark: "#000000", colorLight: "#ffffff", correctLevel: QRCode.CorrectLevel.M }); }
+            catch (e) { console.error("QR error:", e); }
+        }
+
+        window.saveProfileDetails = async function(e) {
+            e.preventDefault(); if (!currentStudent) return;
+            try {
+                await updateDoc(doc(db, 'interns', currentStudent.id), { fullName: $('edit-name').value.trim(), domain: $('edit-domain').value, college: $('edit-college').value.trim() });
+                showToast("Certificate details updated!", "success");
+            } catch (err) { console.error(err); showToast("Could not save. Details are locked once your certificate is issued.", "error"); }
+        };
+        window.handleTaskSubmit = async function(e) {
+            e.preventDefault(); if (!currentStudent) return;
+            const links = [1, 2, 3].map(n => safeUrl($('task' + n + '-link').value.trim()));
+            if (links.some(l => !l)) { showToast("Please enter a valid link (starting with http:// or https://) for each task.", "error"); return; }
+            try {
+                await updateDoc(doc(db, 'interns', currentStudent.id), { tasks: { task1: links[0], task2: links[1], task3: links[2], completed: true }, taskStatus: 'submitted' });
+                showToast("All 3 tasks submitted. Step 2 (₹99 payment) is now unlocked, and our team will review your tasks.", "success");
+            } catch (err) { console.error(err); showToast("Could not submit tasks. Try again.", "error"); }
+        };
+        async function compressImage(file) {
+            const bmp = await createImageBitmap(file);
+            for (const [w, q] of [[1000, .72], [800, .6], [600, .5]]) {
+                const sc = Math.min(1, w / Math.max(bmp.width, bmp.height)), c = document.createElement('canvas');
+                c.width = Math.round(bmp.width * sc); c.height = Math.round(bmp.height * sc);
+                c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+                const d = c.toDataURL('image/jpeg', q); if (d.length < 400000) return d;
+            }
+            throw new Error('too big');
+        }
+        window.handleUtrSubmit = async function(e) {
+            e.preventDefault(); if (!currentStudent) return;
+            const utr = $('utr-input').value.trim();
+            if (!/^\d{12}$/.test(utr)) { showToast("UTR must be exactly 12 digits.", "error"); return; }
+            const btn = e.submitter; if (btn) btn.disabled = true;
+            try {
+                const patch = { utrNumber: utr, paymentStatus: "pending_verification" };
+                const f = $('proof-input').files[0];
+                if (f) {
+                    const now = new Date().toISOString();
+                    await setDoc(doc(db, 'proofs', currentStudent.id), { uid: currentStudent.id, dataUrl: await compressImage(f), uploadedAt: now });
+                    patch.proofAt = now;
+                }
+                await updateDoc(doc(db, 'interns', currentStudent.id), patch);
+                $('proof-input').value = '';
+                showToast("UTR Submitted! Admin will verify your ₹99 payment shortly.", "info");
+            } catch (err) { console.error(err); showToast("Could not submit. Please try a smaller screenshot or try again.", "error"); }
+            finally { if (btn) btn.disabled = false; }
+        };
+
+        window.copyUpiId = function() {
+            const t = document.createElement("textarea"); t.value = "9839411035@ptsbi";
+            document.body.appendChild(t); t.select(); document.execCommand("copy"); document.body.removeChild(t);
+            showToast("UPI ID (9839411035@ptsbi) Copied!", "success");
+        };
+
+        window.triggerPrintCertificate = function() {
+            if (!currentStudent || currentStudent.paymentStatus !== 'paid') { showToast("Please complete your tasks and ₹99 payment first.", "error"); return; }
+            window.print();
+        };
+        window.triggerDownloadCertificate = async function() {
+            if (!currentStudent || currentStudent.paymentStatus !== 'paid') { showToast("Please complete your tasks and ₹99 payment first.", "error"); return; }
+            const btn = $('btn-download-cert'), orig = btn.innerHTML;
+            btn.disabled = true; btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Generating PDF...`;
+            try {
+                await document.fonts.ready;
+                const holder = $('cert-capture'), clone = $('certificate-canvas').cloneNode(true);
+                clone.style.transform = 'none'; clone.style.marginLeft = '0'; clone.style.boxShadow = 'none'; holder.replaceChildren(clone);
+                const canvas = await html2canvas(clone, { scale: 2.5, useCORS: true, backgroundColor: '#ffffff', width: 1122, height: 793, windowWidth: 1122, windowHeight: 793, scrollX: 0, scrollY: 0 });
+                holder.replaceChildren();
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
+                pdf.addImage(canvas.toDataURL('image/jpeg', 0.98), 'JPEG', 0, 0, 297, 210);
+                pdf.save(`CodeAnvil_Certificate_${currentStudent.internId}.pdf`);
+                showToast("Certificate PDF Downloaded!", "success");
+            } catch (err) { console.error(err); showToast("Error generating PDF. Try the Print button!", "error"); }
+            finally { btn.disabled = false; btn.innerHTML = orig; }
+        };
+        // ---------- Offer letter ----------
+        function buildOfferHTML(s) {
+            const date = fmtDate(s.createdAt);
+            const ref = `CA/OL/${new Date(s.createdAt || Date.now()).getFullYear()}/${esc(s.internId)}`;
+            const udyam = BUSINESS.udyamNo ? `<div style="margin-top:4px">Udyam Registration No.: ${BUSINESS.udyamNo}</div>` : '';
+            return `
+            <div class="offer-sheet">
+                <div style="display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #f59e0b;padding-bottom:16px">
+                    <div style="display:flex;align-items:center;gap:10px">
+                        <svg width="50" height="50" viewBox="0 0 120 120"><circle cx="60" cy="60" r="56" fill="#f59e0b"/><circle cx="60" cy="60" r="49" fill="none" stroke="#fff" stroke-width="3.5"/><text x="60" y="42" font-family="Montserrat,sans-serif" font-size="22" font-weight="800" fill="#292524" text-anchor="middle">&lt;/&gt;</text><text x="60" y="68" font-family="Montserrat,sans-serif" font-size="22" font-weight="900" fill="#292524" text-anchor="middle">CODE</text><text x="60" y="91" font-family="Georgia,serif" font-style="italic" font-size="20" font-weight="700" fill="#fff" text-anchor="middle">Anvil</text></svg>
+                        <div style="font-size:28px;font-weight:900;letter-spacing:-0.5px"><span style="color:#f59e0b">CODE</span> <span style="color:#ef4444">ANVIL</span></div>
+                    </div>
+                    <div style="text-align:right;font-size:12px;color:#475569;line-height:1.6">${BUSINESS.website}<br>${BUSINESS.email}</div>
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-top:20px;font-size:13px;color:#334155">
+                    <div><strong>Ref No.:</strong> ${ref}</div><div><strong>Date:</strong> ${date}</div>
+                </div>
+                <h2 style="text-align:center;font-size:20px;font-weight:800;letter-spacing:2px;margin:24px 0 18px">INTERNSHIP OFFER LETTER</h2>
+                <div style="font-size:13px;line-height:1.6">
+                    <div><strong>To,</strong></div><div style="font-weight:700">${esc(s.fullName)}</div>
+                    <div>${esc(s.college || '')}</div><div style="color:#475569">Intern ID: ${esc(s.internId)}</div>
+                </div>
+                <p style="font-size:13px;line-height:1.6;margin-top:14px"><strong>Subject:</strong> Offer of Virtual Internship in ${esc(s.domain)}</p>
+                <p style="font-size:13px;line-height:1.6;margin-top:10px">Dear ${esc(s.fullName)},</p>
+                <p style="font-size:13px;line-height:1.6;margin-top:6px">Congratulations! We are pleased to offer you a virtual internship in <strong>${esc(s.domain)}</strong> at ${BUSINESS.name}. The internship lasts four weeks, from <strong>${esc(s.startDate)}</strong> to <strong>${esc(s.endDate)}</strong>, and will be carried out entirely online.</p>
+                <p style="font-size:13px;line-height:1.6;margin-top:8px">During this period, you will complete the following three projects and submit their GitHub or live links through your intern dashboard:</p>
+                <ol style="font-size:13px;line-height:1.6;margin:4px 0 0 20px;padding:0">${tasksFor(s.domain).map(t => `<li>${t.t}</li>`).join('')}</ol>
+                <p style="font-size:13px;line-height:1.6;margin-top:10px"><strong>Terms of the internship:</strong></p>
+                <ol style="font-size:13px;line-height:1.6;margin:4px 0 0 20px;padding:0">
+                    <li>The internship is remote and unpaid. It is meant for learning and portfolio building, and it does not create an employment relationship.</li>
+                    <li>Registration and this offer letter are free of charge.</li>
+                    <li>Once your tasks are approved, a Certificate of Internship Completion can be issued for a one-time fee of ₹99. This fee covers project evaluation, QR verification hosting and certificate issuance.</li>
+                    <li>All projects must be your own original work. Copied work may be rejected.</li>
+                    <li>Please keep your login details private, and read our Terms, Refund Policy and Privacy Policy on the website.</li>
+                </ol>
+                <p style="font-size:13px;line-height:1.6;margin-top:12px">We look forward to your participation and wish you a productive and rewarding learning experience.</p>
+                <div style="margin-top:30px;font-size:13px">
+                    <div style="width:200px;border-bottom:1.5px solid #0f172a;height:34px"></div>
+                    <div style="font-weight:700;margin-top:6px">Founder &amp; Director</div><div style="color:#475569">${BUSINESS.name}</div>
+                </div>
+                <div style="position:absolute;left:64px;right:64px;bottom:40px;border-top:1px solid #cbd5e1;padding-top:10px;font-size:11px;color:#64748b;text-align:center">
+                    ${BUSINESS.name} &bull; ${BUSINESS.website} &bull; ${BUSINESS.email}${udyam}
+                </div>
+            </div>`;
+        }
+        window.openOfferPreview = function() {
+            if (!currentStudent) return;
+            $('offer-preview-holder').innerHTML = buildOfferHTML(currentStudent);
+            $('offer-modal').classList.remove('hidden'); $('offer-modal').classList.add('flex');
+            const hd = $('offer-preview-holder'), box = hd.parentElement, s = Math.min(1, (box.clientWidth - 24) / 794);
+            hd.style.width = '794px'; hd.style.transformOrigin = 'top left'; hd.style.transform = `scale(${s})`;
+            box.style.overflow = 'hidden'; box.style.height = Math.round(1123 * s + 24) + 'px';
+        };
+        window.closeOfferPreview = function() { $('offer-modal').classList.add('hidden'); $('offer-modal').classList.remove('flex'); };
+        window.downloadOfferLetter = async function() {
+            if (!currentStudent) return;
+            showToast("Preparing offer letter PDF...", "info");
+            try {
+                const holder = $('offer-capture'); holder.innerHTML = buildOfferHTML(currentStudent);
+                const canvas = await html2canvas(holder.firstElementChild, { scale: 2.5, useCORS: true, backgroundColor: '#ffffff', width: 794, height: 1123, windowWidth: 794 });
+                const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+                pdf.addImage(canvas.toDataURL('image/jpeg', 0.98), 'JPEG', 0, 0, 210, 297);
+                pdf.save(`CodeAnvil_Offer_Letter_${currentStudent.internId}.pdf`);
+                holder.innerHTML = ''; showToast("Offer letter downloaded.", "success");
+            } catch (err) { console.error(err); showToast("Could not create the PDF. Please try again.", "error"); }
+        };
+
+        // ---------- Verify (public; reads only the certificates collection) ----------
+        window.handleVerifySearch = async function(e) {
+            if (e) e.preventDefault();
+            const raw = $('verify-input').value.trim();
+            if (raw.toLowerCase() === '/admin') { $('verify-input').value = ''; window.location.hash = '#/admin'; navigateTo('admin'); return; }
+            const q = raw.toUpperCase().replace(/[^A-Z0-9]/g, ''), box = $('verify-result-box'); box.classList.remove('hidden');
+            if (!q) { box.innerHTML = ''; return; }
+            if (!db) { box.innerHTML = `<div class="p-5 rounded-2xl bg-amber-50 border border-amber-300 text-center font-bold text-amber-900">Verification is not available right now.</div>`; return; }
+            box.innerHTML = `<div class="p-5 text-center text-sm text-slate-500"><i class="fa-solid fa-spinner fa-spin"></i> Checking...</div>`;
+            try {
+                const snap = await getDoc(doc(db, 'certificates', q));
+                if (snap.exists()) {
+                    const m = snap.data();
+                    box.innerHTML = `<div class="p-6 rounded-2xl bg-emerald-50 border-2 border-emerald-300 space-y-1">
+                        <div class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-emerald-600 text-white text-xs font-black uppercase"><i class="fa-solid fa-circle-check"></i> Certificate Issued</div>
+                        <h4 class="text-xl font-black text-slate-900 pt-1">${esc(m.fullName)}</h4>
+                        <p class="text-xs font-bold text-slate-700">INTERN ID: <span class="font-mono text-emerald-800">${esc(m.internId)}</span> &bull; DOMAIN: ${esc(m.domain)}</p>
+                        <p class="text-xs text-slate-600">Duration: ${esc(m.startDate)} TO ${esc(m.endDate)}</p>
+                        <p class="text-[11px] text-emerald-700 font-semibold pt-1">Issued by ${esc(BUSINESS.name)}</p></div>`;
+                } else {
+                    box.innerHTML = `<div class="p-5 rounded-2xl bg-rose-50 border border-rose-200 text-center"><div class="font-bold text-rose-900"><i class="fa-solid fa-triangle-exclamation mr-1"></i> No Certificate Found for ID "${esc(q)}"</div><div class="text-xs text-rose-700 mt-1">Please check the Intern ID printed on the certificate and try again.</div></div>`;
+                }
+            } catch (err) { console.error(err); box.innerHTML = `<div class="p-5 rounded-2xl bg-amber-50 border border-amber-300 text-center font-bold text-amber-900">Could not verify right now. Please try again.</div>`; }
+        };
+
+        // ---------- Admin (data is protected by Firestore rules, not by this UI) ----------
+        const isIssued = (i) => i.paymentStatus === 'paid' && i.taskStatus === 'approved';
+        function filteredInterns() {
+            const q = ($('admin-search')?.value || '').trim().toLowerCase();
+            return allInterns.filter(i => !q || [i.internId, i.fullName, i.email, i.phone, i.college, i.domain, i.utrNumber, i.paymentStatus].some(v => String(v || '').toLowerCase().includes(q)));
+        }
+        window.renderAdminTable = renderAdminTable;
+        function renderAdminTable() {
+            const tb = $('admin-interns-tbody'); if (!tb || !isAdminUser) return;
+            $('admin-stat-total').textContent = allInterns.length;
+            $('admin-stat-tasks').textContent = allInterns.filter(i => i.tasks?.completed).length;
+            $('admin-stat-pending').textContent = allInterns.filter(i => i.paymentStatus === 'pending_verification').length;
+            $('admin-stat-paid').textContent = allInterns.filter(isIssued).length;
+            tb.innerHTML = filteredInterns().map(i => {
+                const badge = i.paymentStatus === 'paid' ? `<span class="px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-xs">Paid &amp; Issued ✓</span>`
+                    : i.paymentStatus === 'pending_verification' ? `<span class="px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 font-bold text-xs">Pending Verification</span>`
+                    : `<span class="px-2.5 py-1 rounded-full bg-slate-700 text-slate-400 font-bold text-xs">Unpaid</span>`;
+                const dup = i.utrNumber && allInterns.some(o => o.id !== i.id && o.utrNumber === i.utrNumber) ? `<div class="text-[11px] text-rose-400 font-bold">⚠ Duplicate UTR</div>` : '';
+                const links = i.tasks?.completed
+                    ? `<div class="space-y-1 text-xs">${[i.tasks.task1, i.tasks.task2, i.tasks.task3].map((t, n) => safeUrl(t) ? `<a href="${esc(safeUrl(t))}" target="_blank" rel="noopener noreferrer" class="text-amber-400 hover:underline block"><i class="fa-solid fa-link"></i> Task ${n + 1} Link</a>` : '').join('')}</div>`
+                    : `<span class="text-xs text-slate-500">Not submitted</span>`;
+                const id = esc(i.id);
+                return `<tr class="hover:bg-slate-700/40 transition">
+                    <td class="p-4"><div class="font-black text-amber-400 font-mono text-xs">${esc(i.internId)}</div><div class="font-bold text-white">${esc(i.fullName)}</div><div class="text-xs text-slate-400">${esc(i.email)} ${i.phone ? '&bull; ' + esc(i.phone) : ''}</div></td>
+                    <td class="p-4"><div class="font-bold text-xs text-white">${esc(i.domain)}</div><div class="text-[11px] text-slate-400">${esc(i.startDate)} - ${esc(i.endDate)}</div></td>
+                    <td class="p-4"><div class="text-[11px] font-bold text-slate-300 mb-1">${esc(i.taskStatus || 'none')}</div>${links}</td>
+                    <td class="p-4 font-mono font-bold text-xs text-emerald-300">${esc(i.utrNumber) || '—'}${dup}</td>
+                    <td class="p-4">${badge}</td>
+                    <td class="p-4 text-right"><button onclick="openReview('${id}')" class="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs">Review</button></td></tr>`;
+            }).join('') || `<tr><td colspan="6" class="p-6 text-center text-slate-400 text-sm">No interns found.</td></tr>`;
+        }
+        let reviewId = null;
+        window.openReview = function(id) { reviewId = id; renderReview(); $('review-modal').classList.remove('hidden'); $('review-modal').classList.add('flex'); };
+        window.closeReview = function() { $('review-modal').classList.add('hidden'); $('review-modal').classList.remove('flex'); reviewId = null; };
+        function renderReview() {
+            const i = allInterns.find(x => x.id === reviewId); if (!i) return;
+            const inp = 'w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-600 text-sm text-white', btn = (k, label, c) => `<button onclick="adminAct('${k}')" class="px-3 py-2 rounded-lg ${c} text-white font-bold text-xs">${label}</button>`;
+            const tl = tasksFor(i.domain);
+            const links = [i.tasks?.task1, i.tasks?.task2, i.tasks?.task3].map((t, n) => `<div class="text-xs"><span class="text-slate-400">${esc(tl[n].t)}:</span> ${safeUrl(t) ? `<a href="${esc(safeUrl(t))}" target="_blank" rel="noopener noreferrer" class="text-amber-400 underline break-all">${esc(safeUrl(t))}</a>` : '—'}</div>`).join('');
+            const dup = i.utrNumber && allInterns.some(o => o.id !== i.id && o.utrNumber === i.utrNumber);
+            $('review-body').innerHTML = `
+                <div class="flex items-start justify-between gap-3"><div><div class="font-mono text-amber-400 text-xs font-black">${esc(i.internId)}</div><div class="text-lg font-black">${esc(i.fullName)}</div><div class="text-xs text-slate-400">${esc(i.email)} &bull; ${esc(i.phone)} &bull; ${esc(i.college)}</div><div class="text-xs text-slate-400">${esc(i.domain)}</div></div><button onclick="closeReview()" class="w-8 h-8 rounded-full bg-slate-700 hover:bg-slate-600"><i class="fa-solid fa-xmark"></i></button></div>
+                <div class="p-3 rounded-xl bg-slate-900/60 space-y-2"><div class="text-xs font-bold text-slate-300">Edit details</div>
+                    <input id="rv-name" value="${esc(i.fullName)}" class="${inp}" placeholder="Name">
+                    <div class="grid grid-cols-2 gap-2"><input id="rv-start" value="${esc(i.startDate)}" class="${inp} uppercase" placeholder="JULY 12, 2026"><input id="rv-end" value="${esc(i.endDate)}" class="${inp} uppercase" placeholder="AUGUST 9, 2026"></div>${btn('save', 'Save changes', 'bg-slate-600 hover:bg-slate-500')}</div>
+                <div class="p-3 rounded-xl bg-slate-900/60 space-y-2"><div class="text-xs font-bold text-slate-300">Tasks: <span class="text-amber-300">${esc(i.taskStatus || 'none')}</span></div>${links}
+                    <textarea id="rv-task-note" rows="2" class="${inp}" placeholder="Note to student (used when rejecting)"></textarea><div class="flex gap-2">${btn('task_ok', 'Approve tasks', 'bg-emerald-600 hover:bg-emerald-500')}${btn('task_no', 'Reject tasks', 'bg-rose-600 hover:bg-rose-500')}</div></div>
+                <div class="p-3 rounded-xl bg-slate-900/60 space-y-2"><div class="text-xs font-bold text-slate-300">Payment: <span class="text-amber-300">${esc(i.paymentStatus)}</span> &bull; UTR <span class="font-mono text-emerald-300">${esc(i.utrNumber) || '—'}</span>${dup ? ' <span class="text-rose-400">⚠ Duplicate UTR</span>' : ''}</div>
+                    ${i.proofAt ? `<button onclick="loadProof()" class="px-3 py-1.5 rounded-lg bg-slate-600 hover:bg-slate-500 text-xs font-bold">View screenshot</button>` : '<div class="text-xs text-slate-500">No screenshot uploaded</div>'}<div id="rv-proof" class="text-xs text-slate-400"></div>
+                    <textarea id="rv-pay-note" rows="2" class="${inp}" placeholder="Note to student (used when rejecting)"></textarea><div class="flex gap-2">${btn('pay_ok', 'Approve payment', 'bg-emerald-600 hover:bg-emerald-500')}${btn('pay_no', 'Reject payment', 'bg-rose-600 hover:bg-rose-500')}</div></div>
+                <div class="flex items-center justify-between text-xs"><span class="${isIssued(i) ? 'text-emerald-400' : 'text-slate-400'} font-bold">${isIssued(i) ? 'Certificate issued ✓' : 'Certificate not issued (needs tasks + payment approved)'}</span>${isIssued(i) ? btn('revoke', 'Revoke certificate', 'bg-rose-700 hover:bg-rose-600') : ''}</div>`;
+        }
+        window.loadProof = async function() {
+            const box = $('rv-proof');
+            try {
+                const s = await getDoc(doc(db, 'proofs', reviewId));
+                if (!s.exists() || !String(s.data().dataUrl).startsWith('data:image/jpeg;base64,')) { box.textContent = 'No screenshot found.'; return; }
+                const img = new Image(); img.src = s.data().dataUrl; img.className = 'max-h-96 rounded-lg border border-slate-600'; box.replaceChildren(img);
+            } catch (err) { console.error(err); showToast("Could not load screenshot.", "error"); }
+        };
+        const certData = (i) => ({ uid: i.uid, internId: i.internId, fullName: i.fullName, domain: i.domain, startDate: i.startDate, endDate: i.endDate });
+        window.adminAct = async function(kind) {
+            const t = allInterns.find(x => x.id === reviewId); if (!t || !isAdminUser) return;
+            const v = (id) => ($(id)?.value || '').trim(); let patch;
+            if (kind === 'save') {
+                const s = v('rv-start').toUpperCase(), e = v('rv-end').toUpperCase();
+                if (!v('rv-name') || isNaN(Date.parse(s)) || isNaN(Date.parse(e))) { showToast("Enter a name and valid dates.", "error"); return; }
+                patch = { fullName: v('rv-name'), startDate: s, endDate: e };
+            }
+            else if (kind === 'task_ok') patch = { taskStatus: 'approved', taskNote: '' };
+            else if (kind === 'task_no') patch = { taskStatus: 'rejected', taskNote: v('rv-task-note') || 'Please improve your projects and resubmit.' };
+            else if (kind === 'pay_ok') { if (!t.utrNumber) { showToast("No UTR submitted yet.", "error"); return; } patch = { paymentStatus: 'paid', paymentNote: '' }; }
+            else if (kind === 'pay_no') patch = { paymentStatus: 'unpaid', paymentNote: v('rv-pay-note') || 'Payment could not be verified. Please check the UTR and submit again.' };
+            else if (kind === 'revoke') { if (!confirm("Revoke this certificate? It will stop verifying.")) return; patch = { paymentStatus: 'unpaid', paymentNote: 'Certificate revoked by admin.' }; }
+            else return;
+            const next = { ...t, ...patch };
+            try {
+                const cref = doc(db, 'certificates', t.internId);
+                if (isIssued(next)) { const ex = await getDoc(cref); if (ex.exists() && ex.data().uid !== t.uid) { showToast("Intern ID clash with another certificate. Not issued.", "error"); return; } }
+                await updateDoc(doc(db, 'interns', t.id), patch);
+                if (isIssued(next)) await setDoc(cref, certData(next)); else if (isIssued(t)) await deleteDoc(cref);
+                Object.assign(t, patch); renderReview(); renderAdminTable(); showToast("Done.", "success");
+            } catch (err) { console.error(err); showToast("Action failed. Check admin rules.", "error"); }
+        };
+        window.exportInternsCSV = function() {
+            const cell = (v) => { let s = String(v ?? ''); if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; return '"' + s.replace(/"/g, '""') + '"'; };
+            const head = ['Intern ID', 'Name', 'Email', 'Phone', 'College', 'Domain', 'Start', 'End', 'Task Status', 'Task 1', 'Task 2', 'Task 3', 'UTR', 'Payment Status', 'Registered'];
+            const rows = filteredInterns().map(i => [i.internId, i.fullName, i.email, i.phone, i.college, i.domain, i.startDate, i.endDate, i.taskStatus || 'none', i.tasks?.task1, i.tasks?.task2, i.tasks?.task3, i.utrNumber, i.paymentStatus, i.createdAt]);
+            const csv = '\ufeff' + [head, ...rows].map(r => r.map(cell).join(',')).join('\r\n');
+            const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+            a.download = `codeanvil-interns-${new Date().toISOString().slice(0, 10)}.csv`; document.body.appendChild(a); a.click(); a.remove();
+            showToast(`Exported ${rows.length} interns.`, "success");
+        };
+
+        window.uploadCustomCertLogo = function(event) {
+            const file = event.target.files?.[0]; if (!file) return;
+            const r = new FileReader();
+            r.onload = (e) => {
+                const img = $('cert-custom-codeanvil-img'); img.src = e.target.result; img.classList.remove('hidden');
+                $('cert-default-codeanvil-logo').classList.add('hidden'); showToast("Logo updated on certificate.", "success");
+            };
+            r.readAsDataURL(file);
+        };
+        window.resetCustomLogos = function() {
+            $('cert-custom-codeanvil-img').classList.add('hidden'); $('cert-default-codeanvil-logo').classList.remove('hidden');
+            showToast("Reset to default logo.", "info");
+        };
+
+        function showToast(msg, type = 'info') {
+            const colors = { success: 'bg-emerald-600 text-white', error: 'bg-rose-600 text-white', info: 'bg-slate-900 text-white border border-amber-500/40' };
+            const el = document.createElement('div');
+            el.className = `${colors[type] || colors.info} px-4 py-3 rounded-xl shadow-xl text-xs sm:text-sm font-bold pointer-events-auto transition-all duration-300`;
+            el.textContent = msg; $('toast-container').appendChild(el);
+            setTimeout(() => { el.style.opacity = '0'; setTimeout(() => el.remove(), 300); }, 3800);
+        }
+        window.onload = initFirebase;
+    </script>
+</body>
+</html>
